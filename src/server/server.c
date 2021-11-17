@@ -2,13 +2,13 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include "../shared/huffman/huff.h"
 
 int main(int argc, char const *argv[])
 {
     // TODO when the full bzip2 encode and decode is working
     char *fileName = "mississippi.txt";
 
-    //#region snippet to read file in res/ directory
     char *tmpFileName = malloc(sizeof(char) * (strlen(fileName) + 4));
     strcpy(tmpFileName, "res/");
     strcat(tmpFileName, fileName);
@@ -30,8 +30,19 @@ int main(int argc, char const *argv[])
         printf("%c", c);
     }
     printf("\n");
-
     fclose(file);
-    //#endregion
+    
+    // Execute Huffman
+    char *fileName2 = "Freq.txt";
+
+    char *tmpFileName2 = malloc(sizeof(char) * (strlen(fileName2) + 4));
+    strcpy(tmpFileName2, "res/");
+    strcat(tmpFileName2, fileName2);
+
+    // char * buffer = malloc(sizeof(char) * 20);
+    // sprintf(buffer, "res/%s", "Freq.txt");
+	printf("path = %s\n", tmpFileName2);
+    encodeHuffman(tmpFileName2);
+    
     return 0;
 }
