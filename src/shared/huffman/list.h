@@ -12,9 +12,17 @@ typedef struct elem_list_t
 {
 	node_t *n;
 	struct elem_list_t *suc;
+	struct elem_list_t *pred;
 } list_t;
 
-list_t *listCons(node_t *N, list_t *L);
+typedef struct
+{
+	node_t *min1;
+	node_t *min2;
+} minNodes_t;
+
+list_t *
+listCons(node_t *N, list_t *L);
 
 list_t *emptyListCons();
 
@@ -30,7 +38,11 @@ list_t *insNode(node_t *N, list_t *L);
 
 list_t *destroyList(list_t *L);
 
-char * toStringList(list_t *N);
+list_t *removeMins(list_t *L, minNodes_t *minNodes, node_t *nNode);
+
+minNodes_t getMin(list_t *L);
+
+char *toStringList(list_t *N);
 
 void printList(list_t *N);
 

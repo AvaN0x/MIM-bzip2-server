@@ -5,10 +5,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct elem_node_t {
+typedef struct elem_node_t
+{
 	symbol_t S;
 	frequence_t F;
-	struct elem_node_t * down , * up;
+	char *code;
+	struct elem_node_t *down, *up;
 } node_t;
 
 /**
@@ -18,11 +20,11 @@ typedef struct elem_node_t {
  * Plus tard, vous verrez les objets et leurs patrons (templates)
  */
 
-node_t * emptyNode();
+node_t *emptyNode();
 
-node_t * consNode(symbol_t Sy, frequence_t Freq);
+node_t *consNode(symbol_t Sy, frequence_t Freq);
 
-char * toStringNode(node_t *N);
+char *toStringNode(node_t *N);
 
 void printNode(node_t *N);
 
