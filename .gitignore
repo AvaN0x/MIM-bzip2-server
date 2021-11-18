@@ -7,3 +7,7 @@ desktop.ini
 # Compiled files
 bin/*
 bin/!.gitkeep
+
+# Obj files
+obj/*
+bin/!.gitkeep
