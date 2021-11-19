@@ -46,4 +46,6 @@ char *toStringList(list_t *N);
 
 void printList(list_t *N);
 
+void getCode(node_t *L);
+
 #endif

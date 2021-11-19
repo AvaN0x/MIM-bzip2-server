@@ -1,5 +1,6 @@
 #include <stdbool.h>
 #include <stdio.h>
+#include <string.h>
 #include "list.h"
 #include "TA.h"
 #include "node.h"
@@ -41,25 +42,34 @@ list_t *emptyListCons()
  */
 minNodes_t getMin(list_t *L)
 {
-    minNodes_t mins;
-    mins.min1 = emptyNode();
-    mins.min2 = emptyNode();
+    minNodes_t minNodes;
+    minNodes.min1 = emptyNode();
+    minNodes.min1->F = 99999;
+    minNodes.min2 = emptyNode();
+    minNodes.min2->F = 99999;
 
     while (L->n != NULL)
     {
+        // printf("Current node = ");
+        // printNode(L->n);
         // Get the min
-        if (mins.min1 == NULL)
-            mins.min1 = L->n;
-        else if (mins.min2 == NULL)
-            mins.min2 = L->n;
-        else if (L->n < mins.min1)
+        if (minNodes.min1 == NULL)
+            minNodes.min1 = L->n;
+        else if (minNodes.min2 == NULL)
+            minNodes.min2 = L->n;
+        else if (L->n->F < minNodes.min1->F)
         {
-            if (mins.min1 < mins.min2)
-                mins.min2 = mins.min1;
-            mins.min1 = L->n;
+            if (minNodes.min1->F < minNodes.min2->F)
+                minNodes.min2 = minNodes.min1;
+            minNodes.min1 = L->n;
         }
-        else if (L->n < mins.min2)
-            mins.min2 = L->n;
+        else if (L->n->F < minNodes.min2->F)
+            minNodes.min2 = L->n;
+
+        // printf("Current Mins = [");
+        // printNode(minNodes.min1);
+        // printNode(minNodes.min2);
+        // printf("]\n");
 
         // Go to next
         if (L->suc != NULL)
@@ -68,7 +78,7 @@ minNodes_t getMin(list_t *L)
             break;
     }
 
-    return mins;
+    return minNodes;
 }
 
 void setNode(list_t *L, node_t *N)
@@ -120,29 +130,32 @@ list_t *insNode(node_t *N, list_t *L)
  */
 list_t *removeMins(list_t *L, minNodes_t *minNodes, node_t *nNode)
 {
-    list_t *head = listCons(L->n, L->suc);
-    list_t *newHead = listCons(nNode, L->suc);
+    // Create a new element in first position
+    list_t *newElement = listCons(nNode, L);
+    // Define first element as newElement
+    list_t *head = newElement;
+    L->pred = newElement;
+    L = L->pred;
 
     int removed = 0;
 
     // Get the min nodes out of the flux
     while (removed < 2)
     {
+        // Copy of pointer to clean after getting suc
         list_t *cpy = listCons(L->n, L->suc);
         cpy->pred = L->pred;
-
         if (L->n == minNodes->min1 || L->n == minNodes->min2)
         {
             if (L->n != head->n)
             {
-                // Connect pred and suc together
+                if (L->suc != NULL)
+                    (L->suc)->pred = L->pred;
                 (L->pred)->suc = L->suc;
-                (L->suc)->pred = L->pred;
             }
-            else
-            {
-                (L->suc)->pred = newHead;
-            }
+            else if (L->suc != NULL)
+                head = L->suc;
+
             removed++;
         }
         L = L->suc;
@@ -150,7 +163,7 @@ list_t *removeMins(list_t *L, minNodes_t *minNodes, node_t *nNode)
         cpy->pred = NULL;
     }
 
-    return newHead;
+    return newElement;
 }
 
 list_t *destroyList(list_t *L)
@@ -166,11 +179,37 @@ list_t *destroyList(list_t *L)
 char *toStringList(list_t *L)
 {
     char *buffer = malloc(sizeof(char) * 100);
-    sprintf(buffer, "Liste : [\n\t%s\n]", toStringNode(L->n));
+    sprintf(buffer, "Liste : [%s]", toStringNode(L->n));
     return buffer;
 }
 
 void printList(list_t *L)
 {
     printf("%s\n", toStringList(L));
+}
+
+void getCode(node_t *node)
+{
+    printNode(node);
+    if (node->down != NULL)
+    {
+        printf("Hello down\n");
+        printNode(node->down);
+        node->down->code = realloc(node->down->code, sizeof(char) * (strlen(node->code) + 1));
+        strcat(node->down->code, node->code);
+        printf("sprintf fait\n");
+        getCode(node->down);
+    }
+    if (node->up != NULL)
+    {
+        printf("Hello up\n");
+        printNode(node->up);
+        sprintf(node->up->code, "%s", node->code);
+        printf("sprintf fait\n");
+        getCode(node->up);
+    }
+    int lgth = strlen(node->code);
+    for (int i = 0; i < lgth; i++)
+        printf("%c", node->code[lgth - i]);
+    printf("\n");
 }

@@ -59,7 +59,7 @@ void encodeHuffman(char *file)
 
 	// Get the too lower nodes
 	// if |A| == 1 stop
-	if (lHead->suc != NULL)
+	while (lHead->suc != NULL)
 	{
 		// Create a copy of the head of the list to search min nodes
 		list_t *toGetMin = listCons(lHead->n, lHead->suc);
@@ -85,7 +85,7 @@ void encodeHuffman(char *file)
 		printf("min2.code = %s\n", minNodes.min2->code);
 
 		// Create the new node from the 2 min nodes
-		node_t *nNode = consNode('a', minNodes.min2->F + minNodes.min2->F);
+		node_t *nNode = consNode('a', minNodes.min1->F + minNodes.min2->F);
 		printf("New node created = ");
 		printNode(nNode);
 
@@ -112,6 +112,8 @@ void encodeHuffman(char *file)
 			toMap = toMap->suc;
 		}
 	}
+	// lHead->n->code = ".";
+	// getCode(lHead->n);
 
 	// Free all datas of the list
 	while (lHead->n != NULL)
