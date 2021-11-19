@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <ctype.h>
 
 #define YELLOW "\x1B[33m"
 #define RESET "\x1B[0m"
@@ -28,7 +29,7 @@ void encodeHuffman(char *file)
 	free(file);
 	assert(openFile != NULL);
 
-	// Création de la liste
+	// CREATION OF THE INITIAL LIST
 	int T;
 	while ((T = fscanf(openFile, " %c %d", &S, &F)) == 2)
 	{
@@ -54,55 +55,35 @@ void encodeHuffman(char *file)
 	fclose(openFile);
 	printf("%d == %d\n", T, EOF);
 
-	printf("lHead = ");
-	printList(lHead);
-
-	// Get the too lower nodes
+	// CREATION OF THE HUFFMAN TREE
 	// if |A| == 1 stop
 	while (lHead->suc != NULL)
 	{
 		// Create a copy of the head of the list to search min nodes
 		list_t *toGetMin = listCons(lHead->n, lHead->suc);
-		printf("toGetMin = ");
-		printList(toGetMin);
 		// Get the 2 min nodes
 		minNodes_t minNodes = getMin(toGetMin);
 
-		printf("min1 = %s | min2 = %s\n", toStringNode(minNodes.min1), toStringNode(minNodes.min2));
+		// Given to mins a binary value (part of their code)
+		minNodes.min1->code = (char *)malloc(sizeof(char));
+		sprintf(minNodes.min1->code, "0");
 
-		// Save the binary code for encode later
-		if (minNodes.min1->code == NULL)
-			minNodes.min1->code = "0";
-		else
-			sprintf(minNodes.min1->code, "0");
+		minNodes.min2->code = (char *)malloc(sizeof(char));
+		sprintf(minNodes.min2->code, "1");
 
-		if (minNodes.min2->code == NULL)
-			minNodes.min2->code = "1";
-		else
-			sprintf(minNodes.min2->code, "1");
-
-		printf("min1.code = %s\n", minNodes.min1->code);
-		printf("min2.code = %s\n", minNodes.min2->code);
-
-		// Create the new node from the 2 min nodes
-		node_t *nNode = consNode('a', minNodes.min1->F + minNodes.min2->F);
-		printf("New node created = ");
-		printNode(nNode);
+		// Create the new node from the 2 min nodes. We don't care about the symbol given
+		node_t *nNode = consNode(toupper(minNodes.min1->S), minNodes.min1->F + minNodes.min2->F);
 
 		// Save the new node node as father of min nodes
 		nNode->down = minNodes.min1;
 		nNode->up = minNodes.min2;
-		printf("Connecting nNode with children :\n");
-		printNode(nNode->down);
-		printNode(nNode->up);
-		printf("\n");
 
 		// Remove the 2 mins of the list
 		lHead = removeMins(lHead, &minNodes, nNode);
-		printf("New list head = ");
-		printList(lHead);
 
+		// Print all values of the list
 		printf(YELLOW "\n\nPrint all values of the list : \n" RESET);
+		// Create a copy of lHead to browse through the list
 		list_t *toMap = listCons(lHead->n, lHead->suc);
 		while (toMap->n != NULL)
 		{
@@ -112,8 +93,12 @@ void encodeHuffman(char *file)
 			toMap = toMap->suc;
 		}
 	}
-	// lHead->n->code = ".";
-	// getCode(lHead->n);
+
+	// CONSTRUCT THE CODE OF EACH NODE
+	lHead->n->code = (char *)malloc(sizeof(char));
+	lHead->n->code = "";
+	printf(YELLOW "\nGET CODE\n" RESET);
+	getCode(lHead->n);
 
 	// Free all datas of the list
 	while (lHead->n != NULL)

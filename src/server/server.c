@@ -31,9 +31,9 @@ int main(int argc, char const *argv[])
     }
     printf("\n");
     fclose(file);
-    
+
     // Execute Huffman
-    char *fileName2 = "Freq.txt";
+    char *fileName2 = "FreqCours.txt";
 
     char *tmpFileName2 = malloc(sizeof(char) * (strlen(fileName2) + 4));
     strcpy(tmpFileName2, "res/");
@@ -41,8 +41,8 @@ int main(int argc, char const *argv[])
 
     // char * buffer = malloc(sizeof(char) * 20);
     // sprintf(buffer, "res/%s", "Freq.txt");
-	printf("path = %s\n", tmpFileName2);
+    printf("path = %s\n", tmpFileName2);
     encodeHuffman(tmpFileName2);
-    
+
     return 0;
 }

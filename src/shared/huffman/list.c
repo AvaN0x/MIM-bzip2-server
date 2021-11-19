@@ -31,6 +31,7 @@ list_t *emptyListCons()
     list_t *list = malloc(sizeof(list_t));
     list->n = NULL;
     list->suc = NULL;
+    list->pred = NULL;
     return list;
 }
 
@@ -48,34 +49,39 @@ minNodes_t getMin(list_t *L)
     minNodes.min2 = emptyNode();
     minNodes.min2->F = 99999;
 
+    if (L->suc->suc == NULL)
+    {
+        minNodes.min1 = L->n;
+        minNodes.min2 = L->suc->n;
+
+        return minNodes;
+    }
+
+    // Go to the end
     while (L->n != NULL)
     {
-        // printf("Current node = ");
-        // printNode(L->n);
+        if (L->suc == NULL)
+            break;
+        L = L->suc;
+    }
+
+    while (L->n != NULL)
+    {
         // Get the min
-        if (minNodes.min1 == NULL)
+        if (minNodes.min1->F == 99999)
             minNodes.min1 = L->n;
-        else if (minNodes.min2 == NULL)
+        else if (minNodes.min2->F == 99999)
             minNodes.min2 = L->n;
-        else if (L->n->F < minNodes.min1->F)
+        else if (L->n->F <= minNodes.min1->F)
         {
-            if (minNodes.min1->F < minNodes.min2->F)
+            if (minNodes.min1->F <= minNodes.min2->F)
                 minNodes.min2 = minNodes.min1;
             minNodes.min1 = L->n;
         }
-        else if (L->n->F < minNodes.min2->F)
-            minNodes.min2 = L->n;
 
-        // printf("Current Mins = [");
-        // printNode(minNodes.min1);
-        // printNode(minNodes.min2);
-        // printf("]\n");
-
-        // Go to next
-        if (L->suc != NULL)
-            L = L->suc;
-        else
+        if (L->pred == NULL)
             break;
+        L = L->pred;
     }
 
     return minNodes;
@@ -131,16 +137,14 @@ list_t *insNode(node_t *N, list_t *L)
 list_t *removeMins(list_t *L, minNodes_t *minNodes, node_t *nNode)
 {
     // Create a new element in first position
-    list_t *newElement = listCons(nNode, L);
+    list_t *newElement = listCons(nNode, NULL);
     // Define first element as newElement
-    list_t *head = newElement;
-    L->pred = newElement;
-    L = L->pred;
+    list_t *head = L;
 
     int removed = 0;
 
     // Get the min nodes out of the flux
-    while (removed < 2)
+    while (removed < 2 && L != NULL)
     {
         // Copy of pointer to clean after getting suc
         list_t *cpy = listCons(L->n, L->suc);
@@ -149,21 +153,62 @@ list_t *removeMins(list_t *L, minNodes_t *minNodes, node_t *nNode)
         {
             if (L->n != head->n)
             {
-                if (L->suc != NULL)
-                    (L->suc)->pred = L->pred;
-                (L->pred)->suc = L->suc;
+                if (removed == 0)
+                {
+                    L->pred->suc = newElement;
+                    newElement->pred = L->pred;
+                    if (L->suc != NULL)
+                    {
+                        L->suc->pred = newElement;
+                        newElement->suc = L->suc;
+                    }
+                }
+                else
+                {
+                    if (L->suc != NULL)
+                    {
+                        L->suc->pred = L->pred;
+                        L->pred->suc = L->suc;
+                    }
+                    else
+                    {
+                        L->pred->suc = NULL;
+                    }
+                }
             }
-            else if (L->suc != NULL)
-                head = L->suc;
-
+            else
+            {
+                if (L->suc != NULL)
+                {
+                    // Insert new element as head
+                    if (removed == 0)
+                    {
+                        newElement->suc = L->suc;
+                        L->suc->pred = newElement;
+                        head = newElement;
+                    }
+                    else
+                    {
+                        (L->suc)->pred = NULL;
+                        head = L->suc;
+                    }
+                }
+                else
+                    head = newElement;
+            }
             removed++;
         }
+
         L = L->suc;
-        cpy->suc = NULL;
-        cpy->pred = NULL;
+
+        if (cpy->n == minNodes->min1 || cpy->n == minNodes->min2)
+        {
+            cpy->suc = NULL;
+            cpy->pred = NULL;
+        }
     }
 
-    return newElement;
+    return head;
 }
 
 list_t *destroyList(list_t *L)
@@ -178,6 +223,8 @@ list_t *destroyList(list_t *L)
 
 char *toStringList(list_t *L)
 {
+    if (L == NULL)
+        return "Liste : [null]";
     char *buffer = malloc(sizeof(char) * 100);
     sprintf(buffer, "Liste : [%s]", toStringNode(L->n));
     return buffer;
@@ -188,28 +235,25 @@ void printList(list_t *L)
     printf("%s\n", toStringList(L));
 }
 
+/**
+ * @brief Recursiv function to build the code of every node of the tree
+ *
+ * @param node node_t* The root of the tree
+ */
 void getCode(node_t *node)
 {
-    printNode(node);
     if (node->down != NULL)
     {
-        printf("Hello down\n");
-        printNode(node->down);
-        node->down->code = realloc(node->down->code, sizeof(char) * (strlen(node->code) + 1));
-        strcat(node->down->code, node->code);
-        printf("sprintf fait\n");
+        node->down->code = (char *)realloc(node->down->code, 1 + sizeof(char) * strlen(node->code));
+        node->down->code = strcat(node->down->code, node->code);
         getCode(node->down);
     }
     if (node->up != NULL)
     {
-        printf("Hello up\n");
-        printNode(node->up);
-        sprintf(node->up->code, "%s", node->code);
-        printf("sprintf fait\n");
+        node->up->code = (char *)realloc(node->up->code, 1 + sizeof(char) * strlen(node->code));
+        node->up->code = strcat(node->up->code, node->code);
         getCode(node->up);
     }
-    int lgth = strlen(node->code);
-    for (int i = 0; i < lgth; i++)
-        printf("%c", node->code[lgth - i]);
-    printf("\n");
+
+    printNode(node);
 }
