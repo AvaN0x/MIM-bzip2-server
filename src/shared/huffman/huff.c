@@ -72,7 +72,7 @@ void encodeHuffman(char *file)
 		sprintf(minNodes.min2->code, "1");
 
 		// Create the new node from the 2 min nodes. We don't care about the symbol given
-		node_t *nNode = consNode(toupper(minNodes.min1->S), minNodes.min1->F + minNodes.min2->F);
+		node_t *nNode = consNode(' ', minNodes.min1->F + minNodes.min2->F);
 
 		// Save the new node node as father of min nodes
 		nNode->down = minNodes.min1;

@@ -255,5 +255,6 @@ void getCode(node_t *node)
         getCode(node->up);
     }
 
-    printNode(node);
+    if (node->S != ' ')
+        printNode(node);
 }
