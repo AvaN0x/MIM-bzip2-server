@@ -1,48 +1,50 @@
 BIN := bin
 OBJ := obj
 SRC := src
-GCC := gcc
+CC := gcc
 FLAGS := -Wall
-
-# Section HUFFMAN
-HUFFMAN := src/shared/huffman
 
 all: bin obj client server
 
 
 
-bin: binHuffman
+bin:
 	@[ -d $(BIN) ] || mkdir -p $(BIN)
 
-binHuffman:
-	@[ -d $(BIN)/huffman ] || mkdir -p $(BIN)/huffman
 
-
-
-obj: objHuffman
+obj: objHuffman objBWT objM2F
 	@[ -d $(OBJ) ] || mkdir -p $(OBJ)
 
+objBWT:
+	@[ -d $(OBJ)/bwt ] || mkdir -p $(OBJ)/bwt
+objM2F:
+	@[ -d $(OBJ)/m2f ] || mkdir -p $(OBJ)/m2f
 objHuffman:
 	@[ -d $(OBJ)/huffman ] || mkdir -p $(OBJ)/huffman
 
 
-
 client:
-	$(GCC) $(FLAGS) $(SRC)/client/client.c -o $(BIN)/client
+	$(CC) $(FLAGS) $(SRC)/client/client.c -o $(BIN)/client
 
-server: huffman
-	$(GCC) $(FLAGS) -o $(BIN)/server $(SRC)/server/server.c $(HUFFMAN)/node.c $(HUFFMAN)/list.c $(HUFFMAN)/huff.c -lpthread
+server: bwt m2f huffman
+	$(CC) $(FLAGS) -o $(BIN)/server $(SRC)/server/server.c $(SRC)/shared/bwt/bwt.c $(SRC)/shared/m2f/m2f.c $(SRC)/shared/huffman/node.c $(SRC)/shared/huffman/list.c $(SRC)/shared/huffman/huff.c -lpthread
 
+
+bwt: obj
+	$(CC) $(FLAGS) -o $(OBJ)/bwt/bwt.o -c $(SRC)/shared/bwt/bwt.c
+	
+m2f: obj
+	$(CC) $(FLAGS) -o $(OBJ)/m2f/m2f.o -c $(SRC)/shared/m2f/m2f.c
 
 # Compile everything for Huffman
-huffman : bin obj $(OBJ)/huffman/node.o $(OBJ)/huffman/list.o
-	$(CC) $(FLAGS) -o $(OBJ)/huffman/huff.o -c $(HUFFMAN)/huff.c
+huffman : obj $(OBJ)/huffman/node.o $(OBJ)/huffman/list.o
+	$(CC) $(FLAGS) -o $(OBJ)/huffman/huff.o -c $(SRC)/shared/huffman/huff.c
 
-$(OBJ)/huffman/node.o : obj $(HUFFMAN)/node.c
-	$(CC) $(FLAGS) -o $(OBJ)/huffman/node.o -c $(HUFFMAN)/node.c
+$(OBJ)/huffman/node.o : obj $(SRC)/shared/huffman/node.c
+	$(CC) $(FLAGS) -o $(OBJ)/huffman/node.o -c $(SRC)/shared/huffman/node.c
 
-$(OBJ)/huffman/list.o : obj $(HUFFMAN)/list.c
-	$(CC) $(FLAGS) -o $(OBJ)/huffman/list.o -c $(HUFFMAN)/list.c
+$(OBJ)/huffman/list.o : obj $(SRC)/shared/huffman/list.c
+	$(CC) $(FLAGS) -o $(OBJ)/huffman/list.o -c $(SRC)/shared/huffman/list.c
 
 
 rebuild: clean all
