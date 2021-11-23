@@ -46,6 +46,8 @@ char *toStringList(list_t *N);
 
 void printList(list_t *N);
 
-void getCode(node_t *L);
+void getCode(node_t *L, FILE *encodeFile);
+
+char *reverseCode(char *code);
 
 #endif
