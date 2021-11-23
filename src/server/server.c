@@ -110,5 +110,17 @@ int main(int argc, char const *argv[])
         encodeHuffman(tmpFileName2);
     }
 
+    {
+        char test[] = "eéèe";
+        printf("%s (len=%d)\n", test, (int)strlen(test));
+        for (int i = 0; i < strlen(test); i++)
+        {
+            printf("%d: %c (%d)", i, test[i], test[i]);
+            if (test[i] >= 0 && test[i] <= 127)
+                printf(" and is valid");
+            printf("\n");
+        }
+    }
+
     return 0;
 }
