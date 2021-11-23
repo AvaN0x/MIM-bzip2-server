@@ -51,11 +51,23 @@ int main(int argc, char const *argv[])
 
         int L[len];
         int idx = encodeBWT(S, L);
+        char Sencoded[len + 1];
 
+        printf("%s\n", S);
         printf("idx = %d\n", idx);
 
         for (int i = 0; i < len; i++)
-            printf("L[%2d] = %2d (%c)\n", i, L[i], S[L[i]]);
+        {
+            Sencoded[i] = S[L[i]];
+            // printf("L[%2d] = %2d (%c)\n", i, L[i], S[L[i]]);
+        }
+        Sencoded[len] = '\0';
+        printf("%s\n", Sencoded);
+
+        printf("\033[0;33mDECODE BWT\033[0m\n");
+        char Sdecoded[len + 1];
+        decodeBWT(Sencoded, len, idx, Sdecoded);
+        printf("%s\n", Sdecoded);
     }
 
     //----------//
