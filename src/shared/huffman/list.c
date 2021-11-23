@@ -240,21 +240,38 @@ void printList(list_t *L)
  *
  * @param node node_t* The root of the tree
  */
-void getCode(node_t *node)
+void getCode(node_t *node, FILE *encodeFile)
 {
     if (node->down != NULL)
     {
         node->down->code = (char *)realloc(node->down->code, 1 + sizeof(char) * strlen(node->code));
         node->down->code = strcat(node->down->code, node->code);
-        getCode(node->down);
+        getCode(node->down, encodeFile);
     }
     if (node->up != NULL)
     {
         node->up->code = (char *)realloc(node->up->code, 1 + sizeof(char) * strlen(node->code));
         node->up->code = strcat(node->up->code, node->code);
-        getCode(node->up);
+        getCode(node->up, encodeFile);
     }
 
     if (node->S != ' ')
+    {
+        char *toFile = malloc(sizeof(char) * (1 + 1 + 1 + strlen(node->code)));
+        sprintf(toFile, "%c %s ", node->S, reverseCode(node->code));
+        fwrite(toFile, sizeof(char), strlen(toFile), encodeFile);
         printNode(node);
+    }
+}
+
+char *reverseCode(char *code)
+{
+    int lgth = strlen(code) - 1;
+    for (int i = 0; i < lgth / 2; i++)
+    {
+        char tmp = code[i];
+        code[i] = code[lgth - i];
+        code[lgth - i] = tmp;
+    }
+    return code;
 }

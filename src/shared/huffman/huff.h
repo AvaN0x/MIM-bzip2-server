@@ -3,6 +3,6 @@
 
 #include <stdio.h>
 
-void encodeHuffman(char * file);
+FILE *encodeHuffman(char *file);
 
 #endif

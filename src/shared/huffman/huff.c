@@ -15,7 +15,7 @@
 #define YELLOW "\x1B[33m"
 #define RESET "\x1B[0m"
 
-void encodeHuffman(char *file)
+FILE *encodeHuffman(char *file)
 {
 	// Create the list
 	list_t *list = emptyListCons();
@@ -34,7 +34,7 @@ void encodeHuffman(char *file)
 	while ((T = fscanf(openFile, " %c %d", &S, &F)) == 2)
 	{
 		// Print the value read
-		printf(YELLOW " %d :: Caractere %c de frequence %u \n" RESET, T, S, F);
+		// printf(YELLOW " %d :: Caractere %c de frequence %u \n" RESET, T, S, F);
 
 		/** construction du noeud */
 		node_t *node = consNode(S, F);
@@ -53,7 +53,7 @@ void encodeHuffman(char *file)
 		}
 	}
 	fclose(openFile);
-	printf("%d == %d\n", T, EOF);
+	// printf("%d == %d\n", T, EOF);
 
 	// CREATION OF THE HUFFMAN TREE
 	// if |A| == 1 stop
@@ -82,23 +82,29 @@ void encodeHuffman(char *file)
 		lHead = removeMins(lHead, &minNodes, nNode);
 
 		// Print all values of the list
-		printf(YELLOW "\n\nPrint all values of the list : \n" RESET);
-		// Create a copy of lHead to browse through the list
-		list_t *toMap = listCons(lHead->n, lHead->suc);
-		while (toMap->n != NULL)
+		if (0)
 		{
-			printList(toMap);
-			if (toMap->suc == NULL)
-				break;
-			toMap = toMap->suc;
+			printf(YELLOW "\n\nPrint all values of the list : \n" RESET);
+			// Create a copy of lHead to browse through the list
+			list_t *toMap = listCons(lHead->n, lHead->suc);
+			while (toMap->n != NULL)
+			{
+				printList(toMap);
+				if (toMap->suc == NULL)
+					break;
+				toMap = toMap->suc;
+			}
 		}
 	}
 
 	// CONSTRUCT THE CODE OF EACH NODE
 	lHead->n->code = (char *)malloc(sizeof(char));
 	lHead->n->code = "";
-	printf(YELLOW "\nGET CODE\n" RESET);
-	getCode(lHead->n);
+	printf(YELLOW "\nHUFFMAN\n" RESET);
+
+	FILE *encodeFile = fopen("res/encodedHuffman.txt", "w");
+	assert(encodeFile != NULL);
+	getCode(lHead->n, encodeFile);
 
 	// Free all datas of the list
 	while (lHead->n != NULL)
@@ -107,4 +113,6 @@ void encodeHuffman(char *file)
 			break;
 		lHead = destroyList(lHead);
 	}
+
+	return encodeFile;
 }

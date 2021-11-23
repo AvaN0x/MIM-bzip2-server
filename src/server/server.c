@@ -84,6 +84,7 @@ int main(int argc, char const *argv[])
     //--------------//
     // Test huffman //
     //--------------//
+    if (0)
     {
         // Execute Huffman
         char *fileName2 = "FreqCours.txt";
@@ -92,10 +93,9 @@ int main(int argc, char const *argv[])
         strcpy(tmpFileName2, "res/");
         strcat(tmpFileName2, fileName2);
 
-        // char * buffer = malloc(sizeof(char) * 20);
-        // sprintf(buffer, "res/%s", "Freq.txt");
         printf("path = %s\n", tmpFileName2);
-        encodeHuffman(tmpFileName2);
+        FILE *encodedHuffman = encodeHuffman(tmpFileName2);
+        free(tmpFileName2);
     }
 
     return 0;
