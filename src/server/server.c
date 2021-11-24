@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+
+#include "process.h"
 #include "../shared/huffman/huff.h"
 #include "../shared/bwt/bwt.h"
 #include "../shared/m2f/m2f.h"
@@ -9,9 +11,11 @@
 int main(int argc, char const *argv[])
 {
     // TODO when the full bzip2 encode and decode is working
+    processFile("lorem_ipsum.txt");
     //----------------------//
     // Read content of file //
     //----------------------//
+    if (0)
     {
         char *fileName = "mississippi.txt";
 
@@ -38,11 +42,12 @@ int main(int argc, char const *argv[])
         printf("\n");
         fclose(file);
     }
+    printf("\n");
 
     //----------//
     // Test BWT //
     //----------//
-
+    if (0)
     {
         printf("\033[0;33mENCODE BWT\033[0m\n");
 
@@ -68,11 +73,13 @@ int main(int argc, char const *argv[])
         char Sdecoded[len + 1];
         decodeBWT(Sencoded, len, idx, Sdecoded);
         printf("%s\n", Sdecoded);
+        printf("\n");
     }
 
     //----------//
     // Test M2F //
     //----------//
+    if (0)
     {
         char *S = "PSSMIPISSII";
         // char *S = "mississippi";
@@ -92,24 +99,27 @@ int main(int argc, char const *argv[])
         printf("%s\n", Sdecoded);
 
         free(shifts);
+        printf("\n");
     }
+
     //--------------//
     // Test huffman //
     //--------------//
     if (0)
     {
         // Execute Huffman
-        char *fileName2 = "FreqCours.txt";
+        char *fileName = "FreqCours.txt";
 
-        char *tmpFileName2 = malloc(sizeof(char) * (strlen(fileName2) + 4));
-        strcpy(tmpFileName2, "res/");
-        strcat(tmpFileName2, fileName2);
+        char *tmpFileName = malloc(sizeof(char) * (strlen(fileName) + 4));
+        strcpy(tmpFileName, "res/");
+        strcat(tmpFileName, fileName);
 
-        printf("path = %s\n", tmpFileName2);
-        FILE *encodedHuffman = encodeHuffman(tmpFileName2);
-        free(tmpFileName2);
+        printf("path = %s\n", tmpFileName);
+        FILE *encodedHuffman = encodeHuffman(tmpFileName);
+        free(tmpFileName);
     }
 
+    if (0)
     {
         char test[] = "eéèe";
         printf("%s (len=%d)\n", test, (int)strlen(test));
@@ -120,6 +130,7 @@ int main(int argc, char const *argv[])
                 printf(" and is valid");
             printf("\n");
         }
+        printf("\n");
     }
 
     return 0;
