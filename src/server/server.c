@@ -14,8 +14,8 @@ int main(int argc, char const *argv[])
     // TODO when the full bzip2 encode and decode is working
     // if (0)
     {
-        // processFile("lorem_ipsum.txt");
-        processFile("mississippi.txt");
+        processFile("lorem_ipsum.txt");
+        // processFile("mississippi.txt");
     }
     //----------------------//
     // Read content of file //
@@ -84,7 +84,7 @@ int main(int argc, char const *argv[])
         // char *S = "mississippi";
         int len = strlen(S);
 
-        int *shifts = (int *)calloc(len, sizeof(int));
+        char *shifts = (char *)calloc(len, sizeof(char));
         encodeM2F(S, shifts);
 
         printf(FONT_YELLOW "ENCODE M2F\n" FONT_DEFAULT);

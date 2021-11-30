@@ -3,7 +3,7 @@
 #include <string.h>
 #include "m2f.h"
 
-void encodeM2F(char *S, int *shifts)
+void encodeM2F(char *S, char *shifts)
 {
     int len = strlen(S);
     char alphabet[128];
@@ -39,7 +39,7 @@ void encodeM2F(char *S, int *shifts)
     }
 }
 
-void decodeM2F(int *shifts, int len, char *result)
+void decodeM2F(char *shifts, int len, char *result)
 {
     char alphabet[128];
     // Init alphabet to ASCII table
@@ -51,7 +51,7 @@ void decodeM2F(int *shifts, int len, char *result)
     for (int i = 0; i < len; i++)
     {
         // result[i] = 'a';
-        c = alphabet[shifts[i]];
+        c = alphabet[(int)shifts[i]];
 
         int shift = 0;
         //#region seak for shift
@@ -91,13 +91,16 @@ void decodeM2F(int *shifts, int len, char *result)
 //     char *S = "mississippi";
 //     int len = strlen(S);
 
-//     int *shifts = (int *)calloc(len, sizeof(int));
+//     char *shifts = (char *)calloc(len, sizeof(char));
 //     encodeM2F(S, shifts);
 
 //     printf("\033[0;33mENCODE\033[0m\n");
 //     printf("%s\n", S);
 //     for (int i = 0; i < len; i++)
 //         printf("%c (%2d) = %d\n", S[i], i, shifts[i]);
+//     for (int i = 0; i < len; i++)
+//         printf("%c", shifts[i]);
+//     printf("\n");
 
 //     printf("\033[0;33mDECODE\033[0m\n");
 //     char Sdecoded[len];
