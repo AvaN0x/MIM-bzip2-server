@@ -12,7 +12,11 @@
 int main(int argc, char const *argv[])
 {
     // TODO when the full bzip2 encode and decode is working
-    processFile("lorem_ipsum.txt");
+    // if (0)
+    {
+        // processFile("lorem_ipsum.txt");
+        processFile("mississippi.txt");
+    }
     //----------------------//
     // Read content of file //
     //----------------------//
@@ -50,29 +54,23 @@ int main(int argc, char const *argv[])
     //----------//
     if (0)
     {
-        printf("\033[0;33mENCODE BWT\033[0m\n");
+        printf(FONT_YELLOW "ENCODE BWT\n" FONT_DEFAULT);
 
+        //! Don't use char that are not in the ASCII table !!
         char *S = "MISSISSIPPI";
         int len = strlen(S);
 
-        int L[len];
+        char L[len + 1];
         int idx = encodeBWT(S, L);
-        char Sencoded[len + 1];
 
         printf("%s\n", S);
         printf("idx = %d\n", idx);
 
-        for (int i = 0; i < len; i++)
-        {
-            Sencoded[i] = S[L[i]];
-            // printf("L[%2d] = %2d (%c)\n", i, L[i], S[L[i]]);
-        }
-        Sencoded[len] = '\0';
-        printf("%s\n", Sencoded);
+        printf("%s\n", L);
 
-        printf("\033[0;33mDECODE BWT\033[0m\n");
+        printf(FONT_YELLOW "DECODE BWT\n" FONT_DEFAULT);
         char Sdecoded[len + 1];
-        decodeBWT(Sencoded, len, idx, Sdecoded);
+        decodeBWT(L, len, idx, Sdecoded);
         printf("%s\n", Sdecoded);
         printf("\n");
     }
@@ -89,12 +87,12 @@ int main(int argc, char const *argv[])
         int *shifts = (int *)calloc(len, sizeof(int));
         encodeM2F(S, shifts);
 
-        printf("\033[0;33mENCODE M2F\033[0m\n");
+        printf(FONT_YELLOW "ENCODE M2F\n" FONT_DEFAULT);
         printf("%s\n", S);
         for (int i = 0; i < len; i++)
-            printf("%c (%2d) = %d\n", S[i], i, shifts[i]);
+            printf("%c (%2d) = %2d '%c'\n", S[i], i, shifts[i], shifts[i]);
 
-        printf("\033[0;33mDECODE M2F\033[0m\n");
+        printf(FONT_YELLOW "DECODE M2F\n" FONT_DEFAULT);
         char Sdecoded[len];
         decodeM2F(shifts, len, Sdecoded);
         printf("%s\n", Sdecoded);

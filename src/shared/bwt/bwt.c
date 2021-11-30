@@ -30,7 +30,7 @@ int traiterSousChaines(char *S, int k, int j)
     return (S[ij] < S[ik]) ? j : k;
 }
 
-int encodeBWT(char *S, int *L)
+int encodeBWT(char *S, char *L)
 {
     int idx, j, k;
     int len = strlen(S);
@@ -57,14 +57,14 @@ int encodeBWT(char *S, int *L)
             j = inc(j, len);
         }
 
-        L[i] = dec(k, len);
+        L[i] = S[dec(k, len)];
 
         if (k == 0)
             idx = i;
 
         M[k] = true;
     }
-
+    L[len] = '\0';
     return idx;
 }
 
@@ -132,25 +132,18 @@ void decodeBWT(char *SL, int len, int idx, char *outS)
 //     // char *S = "MISSISSIPPI";
 //     int len = strlen(S);
 
-//     int L[len];
+//     char L[len + 1];
 //     int idx = encodeBWT(S, L);
-//     char Sencoded[len + 1];
 
 //     printf("%s\n", S);
 //     printf("\033[0;33mENCODE BWT\033[0m\n");
 //     printf("idx = %d\n", idx);
 
-//     for (int i = 0; i < len; i++)
-//     {
-//         Sencoded[i] = S[L[i]];
-//         // printf("L[%2d] = %2d (%c)\n", i, L[i], S[L[i]]);
-//     }
-//     Sencoded[len] = '\0';
-//     printf("%s\n", Sencoded);
+//     printf("%s\n", L);
 
 //     printf("\033[0;33mDECODE BWT\033[0m\n");
 //     char Sdecoded[len + 1];
-//     decodeBWT(Sencoded, len, idx, Sdecoded);
+//     decodeBWT(L, len, idx, Sdecoded);
 //     printf("%s\n", Sdecoded);
 
 //     return EXIT_SUCCESS;

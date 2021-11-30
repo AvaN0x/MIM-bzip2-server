@@ -10,6 +10,8 @@
 #include "../shared/bwt/bwt.h"
 #include "../shared/m2f/m2f.h"
 
+#define BUFFERSIZE 512
+
 void processFile(char *fileName)
 {
     char *tmpFileName = malloc(sizeof(char) * (strlen(fileName) + 4));
@@ -28,7 +30,7 @@ void processFile(char *fileName)
 
     printf("File content :\n");
     {
-        char buffer[BUFSIZ];
+        char buffer[BUFFERSIZE];
         int count = 0;
         char c;
         while ((c = fgetc(file)) != EOF)
@@ -39,7 +41,7 @@ void processFile(char *fileName)
 
             buffer[count++] = c; // Use actual count value and increment it after
 
-            if (count > (BUFSIZ - 2))
+            if (count > (BUFFERSIZE - 2))
             {
                 buffer[count] = '\0';
                 processBuffer(buffer, count);
@@ -61,5 +63,30 @@ void processFile(char *fileName)
 void processBuffer(char *buffer, int size)
 {
     // int size = strlen(buffer);
-    printf("\x1B[33m%d: \"\x1B[0m%s\x1B[33m\"\x1B[0m\n\n", size, buffer);
+    // Max value of size is BUFFERSIZE - 1
+    char S[size + 1];
+    strcpy(S, buffer);
+    printf(FONT_YELLOW "%d: \"" FONT_DEFAULT "%s" FONT_YELLOW "\"\n\n" FONT_DEFAULT, size, S);
+
+    printf(FONT_YELLOW "ENCODE BWT\n" FONT_DEFAULT);
+
+    char L[size + 1];
+    int idx = encodeBWT(S, L);
+
+    printf("idx = %d\n", idx);
+
+    printf("%s\n", L);
+
+    // |
+    // |
+    // |
+    // |
+    // |
+    // |
+    // |
+
+    // printf(FONT_YELLOW "DECODE BWT\n" FONT_DEFAULT);
+    // char Sdecoded[size + 1];
+    // decodeBWT(L, size, idx, Sdecoded);
+    // printf("%s\n", Sdecoded);
 }
