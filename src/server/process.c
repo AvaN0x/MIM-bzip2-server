@@ -77,6 +77,13 @@ void processBuffer(char *buffer, int size)
 
     printf("%s\n", L);
 
+    int *shifts = (int *)calloc(size, sizeof(int));
+    encodeM2F(L, shifts);
+
+    printf(FONT_YELLOW "ENCODE M2F\n" FONT_DEFAULT);
+    for (int i = 0; i < size; i++)
+        printf("%c (%2d) = %2d '%c'\n", L[i], i, shifts[i], shifts[i]);
+
     // |
     // |
     // |
@@ -85,8 +92,15 @@ void processBuffer(char *buffer, int size)
     // |
     // |
 
-    // printf(FONT_YELLOW "DECODE BWT\n" FONT_DEFAULT);
-    // char Sdecoded[size + 1];
-    // decodeBWT(L, size, idx, Sdecoded);
-    // printf("%s\n", Sdecoded);
+    printf(FONT_YELLOW "DECODE M2F\n" FONT_DEFAULT);
+    char Sdecoded[size];
+    decodeM2F(shifts, size, Sdecoded);
+    printf("%s\n", Sdecoded);
+
+    free(shifts);
+
+    printf(FONT_YELLOW "DECODE BWT\n" FONT_DEFAULT);
+    char bwtSdecoded[size + 1];
+    decodeBWT(Sdecoded, size, idx, bwtSdecoded);
+    printf("%s\n", bwtSdecoded);
 }
