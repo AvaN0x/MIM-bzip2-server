@@ -78,7 +78,7 @@ void processBuffer(char *buffer, int size)
     printf("\"%s\"\n", L);
 
     char *shifts = (char *)calloc(size, sizeof(char));
-    encodeM2F(L, shifts);
+    encodeM2F(L, size, shifts);
 
     printf(FONT_YELLOW "ENCODE M2F\n" FONT_DEFAULT);
     printf("\"");

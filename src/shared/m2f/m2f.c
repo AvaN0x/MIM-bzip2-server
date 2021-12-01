@@ -3,9 +3,8 @@
 #include <string.h>
 #include "m2f.h"
 
-void encodeM2F(char *S, char *shifts)
+void encodeM2F(char *S, int len, char *shifts)
 {
-    int len = strlen(S);
     char alphabet[128];
     // Init alphabet to ASCII table
     for (int i = 0; i < 128; i++)
@@ -92,7 +91,7 @@ void decodeM2F(char *shifts, int len, char *result)
 //     int len = strlen(S);
 
 //     char *shifts = (char *)calloc(len, sizeof(char));
-//     encodeM2F(S, shifts);
+//     encodeM2F(S, len, shifts);
 
 //     printf("\033[0;33mENCODE\033[0m\n");
 //     printf("%s\n", S);

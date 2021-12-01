@@ -15,7 +15,7 @@ int main(int argc, char const *argv[])
     // if (0)
     {
         processFile("lorem_ipsum.txt");
-        // processFile("mississippi.txt");
+        processFile("mississippi.txt");
     }
     //----------------------//
     // Read content of file //
@@ -85,7 +85,7 @@ int main(int argc, char const *argv[])
         int len = strlen(S);
 
         char *shifts = (char *)calloc(len, sizeof(char));
-        encodeM2F(S, shifts);
+        encodeM2F(S, len, shifts);
 
         printf(FONT_YELLOW "ENCODE M2F\n" FONT_DEFAULT);
         printf("%s\n", S);
