@@ -106,16 +106,37 @@ int main(int argc, char const *argv[])
     //--------------//
     if (0)
     {
+        printf(FONT_YELLOW "ENCODE HUFFMAN\n" FONT_DEFAULT);
+        // tmp TODO RLE
+        int dico[128] = {};
+        for (int i = 0; i < 128; i++)
+        {
+            switch (i)
+            {
+            case 0:
+                dico[i] = 3;
+                break;
+            case 1:
+                dico[i] = 2;
+                break;
+            case 3:
+            case 76:
+            case 79:
+            case 80:
+            case 83:
+                dico[i] = 1;
+                break;
+            }
+        }
+        
+        char *encodedHuffman[128];
         // Execute Huffman
-        char *fileName = "FreqCours.txt";
-
-        char *tmpFileName = malloc(sizeof(char) * (strlen(fileName) + 4));
-        strcpy(tmpFileName, "res/");
-        strcat(tmpFileName, fileName);
-
-        printf("path = %s\n", tmpFileName);
-        FILE *encodedHuffman = encodeHuffman(tmpFileName);
-        free(tmpFileName);
+        encodeHuffman(dico, encodedHuffman);
+        for (int i = 0; i < 128; i++)
+        {
+            if (dico[i] != 0)
+                printf("%d|%c : %s\n", i, i, encodedHuffman[i]);
+        }
     }
 
     if (0)
