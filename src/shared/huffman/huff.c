@@ -15,56 +15,83 @@
 #define YELLOW "\x1B[33m"
 #define RESET "\x1B[0m"
 
-FILE *encodeHuffman(char *file)
+void encodeHuffman(int *dico, char **HuffmanDico)
 {
 	// Create the list
-	list_t *list = emptyListCons();
 	list_t *lHead = emptyListCons();
-	lHead->pred = NULL;
+	list_t *pred = emptyListCons();
 
 	symbol_t S;
 	frequence_t F;
 
-	FILE *openFile = fopen(file, "r");
-	free(file);
-	assert(openFile != NULL);
-
-	// CREATION OF THE INITIAL LIST
-	int T;
-	while ((T = fscanf(openFile, " %c %d", &S, &F)) == 2)
+	// Get all values from dictionnary
+	for (int i = 0; i < 128; i++)
 	{
-		// Print the value read
-		// printf(YELLOW " %d :: Caractere %c de frequence %u \n" RESET, T, S, F);
+		if (dico[i] == 0)
+			continue;
 
-		/** construction du noeud */
+		S = i;
+		F = dico[i];
 		node_t *node = consNode(S, F);
+		// printf(YELLOW "Caractere (%c|%d) de frequence %u \n" RESET, i, i, dico[i]);
+		// printNode(node);
 
-		/** insertion du noeud dans la liste */
-		if (list->n == NULL)
+		// Insert newElement at the begining
+		if (lHead->n == NULL)
 		{
-			setNode(list, node);
-			lHead->n = node;
+			list_t *newElement = listConstruct(node);
+			lHead = listCpy(newElement);
+			pred = NULL;
 		}
 		else
 		{
-			list = insNode(node, list);
-			if (lHead->suc == NULL)
-				lHead->suc = list;
+			list_t *newElement = listConstruct(node);
+			// Insert newElement at the begining
+			newElement->suc = lHead;
+
+			lHead = listCpy(newElement);
+
+			// Sort the list
+			while (newElement->suc != NULL)
+			{
+				if (newElement->n->F < newElement->suc->n->F)
+				{
+					// Create a copy of the suc which will move
+					list_t *tmp = listCpy(newElement->suc);
+
+					// Link newElement and his suc to each other
+					newElement->suc->suc = newElement;
+					newElement->suc = tmp->suc;
+
+					// Update tmp for head
+					tmp->suc = newElement;
+					if (newElement->n == lHead->n)
+						lHead = tmp;
+
+					// Link the pred with the new value (suc of newElement)
+					if (pred != NULL)
+						pred->suc = tmp;
+
+					// Update the new pred
+					pred = tmp;
+					pred->suc = tmp->suc;
+				}
+				else
+					break;
+			}
+			// Reset pred for next insertion
+			pred = NULL;
 		}
 	}
-	fclose(openFile);
-	// printf("%d == %d\n", T, EOF);
 
 	// CREATION OF THE HUFFMAN TREE
 	// if |A| == 1 stop
 	while (lHead->suc != NULL)
 	{
-		// Create a copy of the head of the list to search min nodes
-		list_t *toGetMin = listCons(lHead->n, lHead->suc);
 		// Get the 2 min nodes
-		minNodes_t minNodes = getMin(toGetMin);
+		minNodes_t minNodes = getMin(lHead);
 
-		// Given to mins a binary value (part of their code)
+		// Give to mins a binary value (part of their code)
 		minNodes.min1->code = (char *)malloc(sizeof(char));
 		sprintf(minNodes.min1->code, "0");
 
@@ -73,7 +100,6 @@ FILE *encodeHuffman(char *file)
 
 		// Create the new node from the 2 min nodes. We don't care about the symbol given
 		node_t *nNode = consNode(' ', minNodes.min1->F + minNodes.min2->F);
-
 		// Save the new node node as father of min nodes
 		nNode->down = minNodes.min1;
 		nNode->up = minNodes.min2;
@@ -85,26 +111,15 @@ FILE *encodeHuffman(char *file)
 		if (0)
 		{
 			printf(YELLOW "\n\nPrint all values of the list : \n" RESET);
-			// Create a copy of lHead to browse through the list
-			list_t *toMap = listCons(lHead->n, lHead->suc);
-			while (toMap->n != NULL)
-			{
-				printList(toMap);
-				if (toMap->suc == NULL)
-					break;
-				toMap = toMap->suc;
-			}
+			printList(lHead);
 		}
 	}
 
-	// CONSTRUCT THE CODE OF EACH NODE
+	// CONSTRUCT THE CODE FOR EACH NODE
 	lHead->n->code = (char *)malloc(sizeof(char));
 	lHead->n->code = "";
-	printf(YELLOW "\nHUFFMAN\n" RESET);
 
-	FILE *encodeFile = fopen("res/encodedHuffman.txt", "w");
-	assert(encodeFile != NULL);
-	getCode(lHead->n, encodeFile);
+	getCode(lHead->n, HuffmanDico);
 
 	// Free all datas of the list
 	while (lHead->n != NULL)
@@ -113,6 +128,4 @@ FILE *encodeHuffman(char *file)
 			break;
 		lHead = destroyList(lHead);
 	}
-
-	return encodeFile;
 }
