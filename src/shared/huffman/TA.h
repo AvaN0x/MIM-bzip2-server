@@ -3,7 +3,7 @@
 
 #include <stdlib.h>
 
-typedef unsigned char symbol_t;
+typedef unsigned int symbol_t;
 
 typedef unsigned int frequence_t;
 
