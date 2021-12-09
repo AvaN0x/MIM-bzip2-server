@@ -10,11 +10,12 @@
 #include "../shared/huffman/huff.h"
 #include "../shared/bwt/bwt.h"
 #include "../shared/m2f/m2f.h"
+#include "../shared/rle/rle.h"
 
 int main(int argc, char const *argv[])
 {
     // TODO when the full bzip2 encode and decode is working
-    // if (0)
+    if (0)
     {
         processFile("lorem_ipsum.txt");
         processFile("mississippi.txt");
@@ -75,6 +76,37 @@ int main(int argc, char const *argv[])
         decodeBWT(L, len, idx, Sdecoded);
         printf("%s\n", Sdecoded);
         printf("\n");
+    }
+
+    //----------//
+    // Test RLE //
+    //----------//
+    if (0)
+    {
+        // char *S = "mississippi";
+        // char *S = "122333444455555666666777777788888888999999999";
+        char *S = "misssssssssssssisssssipppi";
+
+        int len = strlen(S);
+
+        char *Sencoded;
+        int encodedLen;
+
+        printf("(%d) %s\n", len, S);
+        printf("\033[0;33mENCODE\033[0m\n");
+        encodeRLE(S, len, &Sencoded, &encodedLen);
+
+        printf("(%d) ", encodedLen);
+        for (int i = 0; i < encodedLen; i++)
+            printf("%c", Sencoded[i]);
+        printf("\n");
+
+        printf("\033[0;33mDECODE\033[0m\n");
+        char *Sdecoded;
+        int decodedLen;
+
+        decodeRLE(Sencoded, encodedLen, &Sdecoded, &decodedLen);
+        printf("(%d) %s\n", decodedLen, Sdecoded);
     }
 
     //----------//

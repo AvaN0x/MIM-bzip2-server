@@ -168,32 +168,32 @@ void decodeRLE(char *S, int len, char **res, int *resLen)
     realloc(*res, shift * sizeof(char));
 }
 
-int main(int argc, char const *argv[])
-{
-    // char *S = "mississippi";
-    // char *S = "122333444455555666666777777788888888999999999";
-    char *S = "misssssssssssssisssssipppi";
+// int main(int argc, char const *argv[])
+// {
+//     // char *S = "mississippi";
+//     // char *S = "122333444455555666666777777788888888999999999";
+//     char *S = "misssssssssssssisssssipppi";
 
-    int len = strlen(S);
+//     int len = strlen(S);
 
-    char *Sencoded;
-    int encodedLen;
+//     char *Sencoded;
+//     int encodedLen;
 
-    printf("(%d) %s\n", len, S);
-    printf("\033[0;33mENCODE\033[0m\n");
-    encodeRLE(S, len, &Sencoded, &encodedLen);
+//     printf("(%d) %s\n", len, S);
+//     printf("\033[0;33mENCODE\033[0m\n");
+//     encodeRLE(S, len, &Sencoded, &encodedLen);
 
-    printf("(%d) ", encodedLen);
-    for (int i = 0; i < encodedLen; i++)
-        printf("%c", Sencoded[i]);
-    printf("\n");
+//     printf("(%d) ", encodedLen);
+//     for (int i = 0; i < encodedLen; i++)
+//         printf("%c", Sencoded[i]);
+//     printf("\n");
 
-    printf("\033[0;33mDECODE\033[0m\n");
-    char *Sdecoded;
-    int decodedLen;
+//     printf("\033[0;33mDECODE\033[0m\n");
+//     char *Sdecoded;
+//     int decodedLen;
 
-    decodeRLE(Sencoded, encodedLen, &Sdecoded, &decodedLen);
-    printf("(%d) %s\n", decodedLen, Sdecoded);
+//     decodeRLE(Sencoded, encodedLen, &Sdecoded, &decodedLen);
+//     printf("(%d) %s\n", decodedLen, Sdecoded);
 
-    return EXIT_SUCCESS;
-}
+//     return EXIT_SUCCESS;
+// }

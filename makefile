@@ -12,13 +12,15 @@ bin:
 	@[ -d $(BIN) ] || mkdir -p $(BIN)
 
 
-obj: objHuffman objBWT objM2F
+obj: objHuffman objBWT objM2F objRLE
 	@[ -d $(OBJ) ] || mkdir -p $(OBJ)
 
 objBWT:
 	@[ -d $(OBJ)/bwt ] || mkdir -p $(OBJ)/bwt
 objM2F:
 	@[ -d $(OBJ)/m2f ] || mkdir -p $(OBJ)/m2f
+objRLE:
+	@[ -d $(OBJ)/rle ] || mkdir -p $(OBJ)/rle
 objHuffman:
 	@[ -d $(OBJ)/huffman ] || mkdir -p $(OBJ)/huffman
 
@@ -27,7 +29,7 @@ client:
 	$(CC) $(FLAGS) $(SRC)/client/client.c -o $(BIN)/client
 
 server: bwt m2f huffman
-	$(CC) $(FLAGS) -o $(BIN)/server $(SRC)/server/process.c $(SRC)/server/server.c $(SRC)/shared/bwt/bwt.c $(SRC)/shared/m2f/m2f.c $(SRC)/shared/huffman/node.c $(SRC)/shared/huffman/list.c $(SRC)/shared/huffman/huff.c -lpthread
+	$(CC) $(FLAGS) -o $(BIN)/server $(SRC)/server/process.c $(SRC)/server/server.c $(SRC)/shared/bwt/bwt.c $(SRC)/shared/m2f/m2f.c $(SRC)/shared/rle/rle.c $(SRC)/shared/huffman/node.c $(SRC)/shared/huffman/list.c $(SRC)/shared/huffman/huff.c -lpthread
 
 
 bwt: obj
@@ -35,6 +37,9 @@ bwt: obj
 	
 m2f: obj
 	$(CC) $(FLAGS) -o $(OBJ)/m2f/m2f.o -c $(SRC)/shared/m2f/m2f.c
+
+rle: obj
+	$(CC) $(FLAGS) -o $(OBJ)/rle/rle.o -c $(SRC)/shared/rle/rle.c
 
 # Compile everything for Huffman
 huffman : obj $(OBJ)/huffman/node.o $(OBJ)/huffman/list.o
