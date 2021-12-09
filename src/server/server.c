@@ -3,7 +3,9 @@
 #include <unistd.h>
 #include <string.h>
 
+#include "../shared/buffer.h"
 #include "process.h"
+
 #include "../shared/font_colors.h"
 #include "../shared/huffman/huff.h"
 #include "../shared/bwt/bwt.h"
@@ -128,7 +130,7 @@ int main(int argc, char const *argv[])
                 break;
             }
         }
-        
+
         char *encodedHuffman[128];
         // Execute Huffman
         encodeHuffman(dico, encodedHuffman);

@@ -3,14 +3,13 @@
 #include <unistd.h>
 #include <string.h>
 
+#include "../shared/buffer.h"
 #include "process.h"
 
 #include "../shared/font_colors.h"
 #include "../shared/huffman/huff.h"
 #include "../shared/bwt/bwt.h"
 #include "../shared/m2f/m2f.h"
-
-#define BUFFERSIZE 512
 
 void processFile(char *fileName)
 {
