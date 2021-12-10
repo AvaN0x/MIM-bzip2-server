@@ -7,9 +7,8 @@
 void encodeRLE(char *S, int len, char **res, int *resLen)
 {
     int shift = 0;
-    int size = 4;
 
-    *res = malloc(size * sizeof(char));
+    *res = malloc(len * sizeof(char));
 
     char numberString[10];
     int thisCharCount = 0;
@@ -20,24 +19,13 @@ void encodeRLE(char *S, int len, char **res, int *resLen)
         if (shift > len)
         {
             // Abort process because size is to big
-            realloc(*res, len * sizeof(char));
+            // realloc(*res, len * sizeof(char));
             for (int j = 0; j < len; j++)
             {
                 (*res)[j] = S[j];
                 *resLen = len;
             }
             return;
-        }
-
-        // Resize res if needed
-        if (shift > size)
-        {
-            // Will add 32 to the actual size, and if new size is above BUFFERSIZE, then we set it to BUFFERSIZE
-            size = size + 32;
-            if (size > len)
-                size = len;
-            // Realloc res to new size
-            realloc(*res, size * sizeof(char));
         }
 
         // Last char of the string, or next char is different
@@ -83,8 +71,9 @@ void encodeRLE(char *S, int len, char **res, int *resLen)
     }
     (*res)[shift] = '\0';
     *resLen = shift;
-    // Realloc res to the exact size of the result
-    realloc(*res, shift * sizeof(char));
+    // Realloc res to the exact size of the result if needed
+    if (shift != len)
+        realloc(*res, shift * sizeof(char));
 }
 
 void decodeRLE(char *S, int len, char **res, int *resLen)
@@ -165,7 +154,8 @@ void decodeRLE(char *S, int len, char **res, int *resLen)
     (*res)[shift] = '\0';
     *resLen = shift;
     // Realloc res to the exact size of the result
-    realloc(*res, shift * sizeof(char));
+    if (shift != len)
+        realloc(*res, shift * sizeof(char));
 }
 
 // int main(int argc, char const *argv[])
