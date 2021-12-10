@@ -10,6 +10,7 @@
 #include "../shared/huffman/huff.h"
 #include "../shared/bwt/bwt.h"
 #include "../shared/m2f/m2f.h"
+#include "../shared/rle/rle.h"
 
 void processFile(char *fileName)
 {
@@ -17,7 +18,7 @@ void processFile(char *fileName)
     strcpy(tmpFileName, "res/");
     strcat(tmpFileName, fileName);
 
-    printf("tmpFileName: %s\n", tmpFileName);
+    printf("tmpFileName: " FONT_MAGENTA "%s\n" FONT_DEFAULT, tmpFileName);
     FILE *file = fopen(tmpFileName, "r");
     free(tmpFileName);
 
@@ -85,23 +86,44 @@ void processBuffer(char *buffer, int size)
         printf("%c", shifts[i]);
     printf("\"\n");
 
+    printf(FONT_YELLOW "ENCODE RLE\n" FONT_DEFAULT);
+
+    char *S_rle;
+    int rle_len;
+
+    encodeRLE(shifts, size, &S_rle, &rle_len);
+
+    printf("(%d) \"", rle_len);
+    for (int i = 0; i < rle_len; i++)
+        printf("%c", S_rle[i]);
+    printf("\"\n");
+
+    // |
+    // |
+    // |
+    printf("\n\n");
     // |
     // |
     // |
     // |
-    // |
-    // |
-    // |
+
+    printf(FONT_YELLOW "DECODE RLE\n" FONT_DEFAULT);
+
+    char *S_decoded_rle;
+    int rle_decoded_len;
+
+    decodeRLE(S_rle, rle_len, &S_decoded_rle, &rle_decoded_len);
+    printf("(%d) \"%s\"\n", rle_decoded_len, S_decoded_rle);
 
     printf(FONT_YELLOW "DECODE M2F\n" FONT_DEFAULT);
-    char Sdecoded[size];
-    decodeM2F(shifts, size, Sdecoded);
+    char Sdecoded[rle_decoded_len];
+    decodeM2F(S_decoded_rle, rle_decoded_len, Sdecoded);
     printf("\"%s\"\n", Sdecoded);
 
-    free(shifts);
+    // free(shifts);
 
     printf(FONT_YELLOW "DECODE BWT\n" FONT_DEFAULT);
-    char bwtSdecoded[size + 1];
-    decodeBWT(Sdecoded, size, idx, bwtSdecoded);
+    char bwtSdecoded[rle_decoded_len + 1];
+    decodeBWT(Sdecoded, rle_decoded_len, idx, bwtSdecoded);
     printf("\"%s\"\n", bwtSdecoded);
 }

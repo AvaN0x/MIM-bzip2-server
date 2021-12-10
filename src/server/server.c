@@ -15,7 +15,7 @@
 int main(int argc, char const *argv[])
 {
     // TODO when the full bzip2 encode and decode is working
-    if (0)
+    // if (0)
     {
         processFile("lorem_ipsum.txt");
         processFile("mississippi.txt");
