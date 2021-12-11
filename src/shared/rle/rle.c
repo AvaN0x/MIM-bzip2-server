@@ -73,7 +73,7 @@ void encodeRLE(char *S, int len, char **res, int *resLen)
     *resLen = shift;
     // Realloc res to the exact size of the result if needed
     if (shift != len)
-        realloc(*res, shift * sizeof(char));
+        *res = realloc(*res, shift * sizeof(char));
 }
 
 void decodeRLE(char *S, int len, char **res, int *resLen)
@@ -95,7 +95,7 @@ void decodeRLE(char *S, int len, char **res, int *resLen)
             if (size > BUFFERSIZE)
                 size = len;
             // Realloc res to new size
-            realloc(*res, size * sizeof(char));
+            *res = realloc(*res, size * sizeof(char));
         }
 
         // RLE
@@ -155,7 +155,7 @@ void decodeRLE(char *S, int len, char **res, int *resLen)
     *resLen = shift;
     // Realloc res to the exact size of the result
     if (shift != len)
-        realloc(*res, shift * sizeof(char));
+        *res = realloc(*res, shift * sizeof(char));
 }
 
 // int main(int argc, char const *argv[])
