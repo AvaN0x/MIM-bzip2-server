@@ -15,7 +15,7 @@
 #define YELLOW "\x1B[33m"
 #define RESET "\x1B[0m"
 
-void encodeHuffman(int *dico, char **HuffmanDico)
+void buildCodeHuffman(int *frequencies, char **HuffmanDico)
 {
 	// Create the list
 	list_t *lHead = emptyListCons();
@@ -27,13 +27,13 @@ void encodeHuffman(int *dico, char **HuffmanDico)
 	// Get all values from dictionnary
 	for (int i = 0; i < 128; i++)
 	{
-		if (dico[i] == 0)
+		if (frequencies[i] == 0)
 			continue;
 
 		S = i;
-		F = dico[i];
+		F = frequencies[i];
 		node_t *node = consNode(S, F);
-		// printf(YELLOW "Caractere (%c|%d) de frequence %u \n" RESET, i, i, dico[i]);
+		// printf(YELLOW "Caractere (%c|%d) de frequence %u \n" RESET, i, i, frequencies[i]);
 		// printNode(node);
 
 		// Insert newElement at the begining
@@ -128,4 +128,54 @@ void encodeHuffman(int *dico, char **HuffmanDico)
 			break;
 		lHead = destroyList(lHead);
 	}
+}
+
+char *encodeHuffman(char *str, char **HuffmanDico)
+{
+	// printf("String given is : %s\n", str);
+	// The byte that will be saved
+	unsigned char toSend = 0;
+	int count = 0;
+	FILE *binFile = fopen("res/huffmanEncoded.bin", "wb");
+	assert(binFile != NULL);
+
+	for (int i = 0; i < strlen(str); i++)
+	{
+		// get the code of the current caracter of the string
+		char *code = HuffmanDico[(int)str[i]];
+		// printf("Code of %c(%d) is %s\n", str[i], str[i], code);
+
+		for (int j = 0; j < strlen(code); j++)
+		{
+			// printf("toSend was : %d\n", toSend);
+			int myBitInt = code[j] - '0'; // Code is composed of '0' and '1' so we transform that in bit
+			// printf("current bit is %d\n", myBitInt);
+			toSend <<= 1;
+			toSend |= myBitInt;
+			// printf("toSend is now : %d(%c)\n", toSend, toSend);
+			count++;
+			if (count == 8)
+			{
+				count = 0;
+				// printf("count = 8, write toSend into file\n");
+				assert(fwrite(&toSend, sizeof(unsigned char), 1, binFile) == 1);
+				toSend = 0;
+			}
+			// printf("\n");
+		}
+		// printf("\n");
+	}
+	if (count != 0)
+	{
+		// printf("count != 0, write toSend into file\n");
+		assert(fwrite(&toSend, sizeof(unsigned char), 1, binFile) == 1);
+	}
+	assert(fclose(binFile) == 0);
+
+	return "";
+}
+
+char *decodeHuffman(char *str, char **HuffmanDico)
+{
+	return "";
 }

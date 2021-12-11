@@ -15,7 +15,7 @@
 int main(int argc, char const *argv[])
 {
     // TODO when the full bzip2 encode and decode is working
-    // if (0)
+    if (0)
     {
         processFile("lorem_ipsum.txt");
         processFile("mississippi.txt");
@@ -163,14 +163,16 @@ int main(int argc, char const *argv[])
             }
         }
 
-        char *encodedHuffman[128];
-        // Execute Huffman
-        encodeHuffman(dico, encodedHuffman);
+        char *HuffmanDico[128] = {};
+        // Build the code for each caracter where freq > 0
+        buildCodeHuffman(dico, HuffmanDico);
         for (int i = 0; i < 128; i++)
-        {
-            if (dico[i] != 0)
-                printf("%d|%c : %s\n", i, i, encodedHuffman[i]);
-        }
+            if (HuffmanDico[i] != NULL)
+                printf("%d|%c : %s\n", i, i, HuffmanDico[i]);
+        char *encoded = encodeHuffman("OPLS", HuffmanDico);
+        printf(FONT_YELLOW "\nencoded is %s\n" FONT_DEFAULT, encoded);
+        char *decoded = decodeHuffman(encoded, HuffmanDico);
+        printf(FONT_YELLOW "\ndecoded is %s\n" FONT_DEFAULT, decoded);
     }
 
     if (0)
