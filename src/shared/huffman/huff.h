@@ -29,6 +29,6 @@ char *encodeHuffman(char *str, char **HuffmanDico);
  *
  * @return char* The decoded string
  */
-char *decodeHuffman(char *str, char **HuffmanDico);
+char *decodeHuffman(char *binFile, char **HuffmanDico);
 
 #endif
