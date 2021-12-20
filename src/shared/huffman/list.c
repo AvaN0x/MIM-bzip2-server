@@ -228,7 +228,6 @@ void getCode(node_t *node, char **huffmanDico)
         getCode(node->down, huffmanDico);
     }
 
-    // Only print the base of the tree
     if (node->down == NULL && node->up == NULL)
     {
         huffmanDico[node->S] = (char *)malloc(sizeof(char) * strlen(node->code));
