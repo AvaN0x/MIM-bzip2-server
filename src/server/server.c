@@ -138,7 +138,7 @@ int main(int argc, char const *argv[])
     //--------------//
     // Test huffman //
     //--------------//
-    // if (0)
+    if (0)
     {
         printf(FONT_YELLOW "ENCODE HUFFMAN\n" FONT_DEFAULT);
         // tmp TODO RLE
@@ -169,7 +169,6 @@ int main(int argc, char const *argv[])
         for (int i = 0; i < 128; i++)
             if (HuffmanDico[i] != NULL)
                 printf("%d|%c : %s\n", i, i, HuffmanDico[i]);
-
         char *encoded = encodeHuffman("OPLS", HuffmanDico);
         printf(FONT_YELLOW "\nencoded is %s\n" FONT_DEFAULT, encoded);
         char *decoded = decodeHuffman(encoded, HuffmanDico);
