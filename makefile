@@ -29,7 +29,7 @@ client:
 	$(CC) $(FLAGS) $(SRC)/client/client.c -o $(BIN)/client
 
 server: bwt m2f huffman
-	$(CC) $(FLAGS) -o $(BIN)/server $(SRC)/server/process.c $(SRC)/server/server.c $(SRC)/shared/bwt/bwt.c $(SRC)/shared/m2f/m2f.c $(SRC)/shared/rle/rle.c $(SRC)/shared/huffman/node.c $(SRC)/shared/huffman/list.c $(SRC)/shared/huffman/huff.c -lpthread
+	$(CC) $(FLAGS) -o $(BIN)/server $(SRC)/server/process.c $(SRC)/server/server.c $(SRC)/shared/bwt/bwt.c $(SRC)/shared/m2f/m2f.c $(SRC)/shared/rle/rle.c $(SRC)/shared/huffman/node.c $(SRC)/shared/huffman/list.c $(SRC)/shared/huffman/huff.c -lpthread -lm
 
 
 bwt: obj
