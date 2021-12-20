@@ -11,6 +11,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <ctype.h>
+#include <math.h>
 
 #define YELLOW "\x1B[33m"
 #define RESET "\x1B[0m"
@@ -130,8 +131,11 @@ void buildCodeHuffman(int *frequencies, char **HuffmanDico)
 	}
 }
 
-char *encodeHuffman(char *str, char **HuffmanDico)
+unsigned char *encodeHuffman(char *str, char **HuffmanDico)
 {
+	unsigned char *res = (unsigned char *)malloc(sizeof(unsigned char));
+	res[0] = 0;
+	int size = 0;
 	// printf("String given is : %s\n", str);
 	// The byte that will be saved
 	unsigned char toSend = 0;
@@ -159,6 +163,9 @@ char *encodeHuffman(char *str, char **HuffmanDico)
 				count = 0;
 				// printf("count = 8, write toSend into file\n");
 				assert(fwrite(&toSend, sizeof(unsigned char), 1, binFile) == 1);
+
+				res = (unsigned char *)realloc(res, (1 + size) * sizeof(unsigned char));
+				res[size++] = toSend;
 				toSend = 0;
 			}
 			// printf("\n");
@@ -167,15 +174,103 @@ char *encodeHuffman(char *str, char **HuffmanDico)
 	}
 	if (count != 0)
 	{
+		// printf("count is %d\n", count);
+		for (int i = 0; i < count; i++)
+			toSend <<= 1;
 		// printf("count != 0, write toSend into file\n");
 		assert(fwrite(&toSend, sizeof(unsigned char), 1, binFile) == 1);
+
+		res = (unsigned char *)realloc(res, (1 + size) * sizeof(unsigned char));
+		res[size++] = toSend;
 	}
 	assert(fclose(binFile) == 0);
-
-	return "";
+	return res;
 }
 
-char *decodeHuffman(char *str, char **HuffmanDico)
+char *decodeHuffman(char *todo, char **HuffmanDico)
 {
-	return "";
+	FILE *binFile = fopen("res/huffmanEncoded.bin", "rb");
+	assert(binFile != NULL);
+
+	char *res = NULL;
+
+	// All caracters are initially candidates
+	int candidatList[128];
+	for (int z = 0; z < 128; z++)
+		candidatList[z] = 1;
+
+	int nbCandidat = 128;
+	int candidatIdx = 8128; // Sum of 0 to 127
+	int cursor = -1;
+
+	unsigned char buffer = 0;
+	while (fread(&buffer, sizeof(unsigned char), 1, binFile) == 1)
+	{
+		// printf(YELLOW "\nbuffer is %d\n" RESET, buffer);
+
+		for (int i = 7; i >= 0; i--)
+		{
+			// printf(YELLOW "I = %d\n" RESET, i);
+			unsigned char mask = (unsigned char)pow(2.0, (double)i);
+			// printf("Mask is %d\n", mask);
+			unsigned char codeBit = (buffer & mask) >> i;
+			// printf("codeBit is %d\n", codeBit);
+			cursor++;
+			// printf(YELLOW "cursor is %d\n" RESET, cursor);
+
+			for (int j = 0; j < 128; j++)
+			{
+				if (HuffmanDico[j] != NULL)
+				{
+					if (candidatList[j] == 1 && (HuffmanDico[j][cursor] - '0') != codeBit)
+					{
+						candidatList[j] = 0;
+						nbCandidat--;
+						candidatIdx -= j;
+					}
+				}
+				else
+				{
+					if (candidatList[j])
+					{
+						candidatList[j] = 0;
+						nbCandidat--;
+						candidatIdx -= j;
+					}
+				}
+
+				// debug
+				// if (candidatList[j] == 1)
+				// 	printf("%d\n", j);
+
+				if (nbCandidat == 1)
+				{
+					if (res == NULL)
+					{
+						res = (char *)malloc(sizeof(char));
+						res[0] = (char)candidatIdx;
+					}
+					else
+					{
+						// printf("strlen(res) is : %ld\n", strlen(res));
+						res = realloc(res, (strlen(res) + 1) * sizeof(char));
+						res[strlen(res)] = (char)candidatIdx;
+						// printf("strlen(res) is : %ld\n", strlen(res));
+					}
+
+					for (int z = 0; z < 128; z++)
+						candidatList[z] = 1;
+					nbCandidat = 128;
+					candidatIdx = 8128;
+					cursor = -1;
+
+					// printf(YELLOW "res is now : %s\n" RESET, res);
+					break;
+				}
+			}
+		}
+	}
+
+	assert(fclose(binFile) == 0);
+	return res;
 }
