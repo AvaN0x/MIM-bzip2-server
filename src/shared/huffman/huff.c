@@ -11,7 +11,6 @@
 #include <unistd.h>
 #include <string.h>
 #include <ctype.h>
-#include <math.h>
 
 #define YELLOW "\x1B[33m"
 #define RESET "\x1B[0m"
@@ -172,80 +171,11 @@ char *encodeHuffman(char *str, char **HuffmanDico)
 		assert(fwrite(&toSend, sizeof(unsigned char), 1, binFile) == 1);
 	}
 	assert(fclose(binFile) == 0);
+
 	return "";
 }
 
-char *decodeHuffman(char *todo, char **HuffmanDico)
+char *decodeHuffman(char *str, char **HuffmanDico)
 {
-	FILE *binFile = fopen("res/huffmanEncoded.bin", "rb");
-	assert(binFile != NULL);
-
-	char *res = NULL;
-
-	unsigned char buffer = 0;
-	while (fread(&buffer, sizeof(unsigned char), 1, binFile) == 1)
-	{
-		printf(YELLOW "\nbuffer is %d\n" RESET, buffer);
-		// All caracters are initially candidates
-		int candidatList[128] = {1};
-		int nbCandidat = 128;
-		int candidatIdx = 8128; // Sum of 0 to 127
-		int cursor = -1;
-
-		for (int i = 7; i > 0; i--)
-		{
-			printf(YELLOW "I = %d\n" RESET, i);
-			unsigned char mask = (unsigned char)pow(2.0, (double)i);
-			printf("Mask is %d\n", mask);
-			unsigned char codeBit = (buffer & mask) >> i;
-			printf("codeBit is %d\n", codeBit);
-			cursor++;
-			printf(YELLOW "cursor is %d\n" RESET, cursor);
-
-			for (int j = 0; j < 128; j++)
-			{
-				if (HuffmanDico[j] != NULL)
-				{
-					if (candidatList[j] && (HuffmanDico[j][cursor] - '0') != codeBit)
-					{
-						candidatList[j] = 0;
-						nbCandidat--;
-						candidatIdx -= j;
-					}
-				}
-				else
-				{
-					if (candidatList[j])
-					{
-						candidatList[j] = 0;
-						nbCandidat--;
-						candidatIdx -= j;
-					}
-				}
-
-				if (nbCandidat == 1)
-				{
-					if (res == NULL)
-					{
-						res = (char *)malloc(sizeof(char));
-						res[0] = (char)candidatIdx;
-					}
-					else
-					{
-						res = realloc(res, (strlen(res) + 1) * sizeof(char));
-						res[strlen(res) - 1] = (char)candidatIdx;
-					}
-
-					memset(candidatList, 1, sizeof(int) * 128);
-					nbCandidat = 128;
-					candidatIdx = 8128;
-					cursor = -1;
-				}
-			}
-		}
-	}
-
-	assert(fclose(binFile) == 0);
-
-	return res;
+	return "";
 }
