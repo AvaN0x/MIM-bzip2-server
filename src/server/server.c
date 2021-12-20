@@ -169,9 +169,13 @@ int main(int argc, char const *argv[])
         for (int i = 0; i < 128; i++)
             if (HuffmanDico[i] != NULL)
                 printf("%d|%c : %s\n", i, i, HuffmanDico[i]);
-        char *encoded = encodeHuffman("OPLS", HuffmanDico);
-        printf(FONT_YELLOW "\nencoded is %s\n" FONT_DEFAULT, encoded);
-        char *decoded = decodeHuffman(encoded, HuffmanDico);
+
+        unsigned char *encoded = encodeHuffman("OPLS", HuffmanDico);
+        printf(FONT_YELLOW "\nencoded is " FONT_DEFAULT);
+        for (int i = 0; i < strlen((char *)encoded); i++)
+            printf("%u ", encoded[i]);
+        printf("\n");
+        char *decoded = decodeHuffman((char *)encoded, HuffmanDico);
         printf(FONT_YELLOW "\ndecoded is %s\n" FONT_DEFAULT, decoded);
     }
 
