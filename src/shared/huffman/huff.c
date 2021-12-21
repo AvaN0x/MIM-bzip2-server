@@ -16,11 +16,13 @@
 #define YELLOW "\x1B[33m"
 #define RESET "\x1B[0m"
 
+// TODO TO FREE : EACH ELEMENT OF THE LIST
+
 void buildCodeHuffman(int *frequencies, char **HuffmanDico)
 {
 	// Create the list
-	list_t *lHead = emptyListCons();
-	list_t *pred = emptyListCons();
+	list_t *lHead = NULL;
+	list_t *pred = NULL;
 
 	symbol_t S;
 	frequence_t F;
@@ -31,58 +33,60 @@ void buildCodeHuffman(int *frequencies, char **HuffmanDico)
 		if (frequencies[i] == 0)
 			continue;
 
+		// printf(YELLOW "Caractere (%c|%d) de frequence %u \n" RESET, i, i, frequencies[i]);
+
 		S = i;
 		F = frequencies[i];
 		node_t *node = consNode(S, F);
-		// printf(YELLOW "Caractere (%c|%d) de frequence %u \n" RESET, i, i, frequencies[i]);
-		// printNode(node);
+		list_t *newElement = listConstruct(node);
 
 		// Insert newElement at the begining
-		if (lHead->n == NULL)
-		{
-			list_t *newElement = listConstruct(node);
-			lHead = listCpy(newElement);
-			pred = NULL;
-		}
+		if (lHead == NULL)
+			lHead = newElement;
 		else
 		{
-			list_t *newElement = listConstruct(node);
 			// Insert newElement at the begining
 			newElement->suc = lHead;
-
-			lHead = listCpy(newElement);
+			lHead = newElement;
 
 			// Sort the list
 			while (newElement->suc != NULL)
 			{
+				// Swap if freq is lower than the next one
 				if (newElement->n->F < newElement->suc->n->F)
 				{
-					// Create a copy of the suc which will move
-					list_t *tmp = listCpy(newElement->suc);
+					list_t *next = newElement->suc;
 
-					// Link newElement and his suc to each other
-					newElement->suc->suc = newElement;
-					newElement->suc = tmp->suc;
-
-					// Update tmp for head
-					tmp->suc = newElement;
-					if (newElement->n == lHead->n)
-						lHead = tmp;
-
-					// Link the pred with the new value (suc of newElement)
+					// link the pred with the suc of newElement
 					if (pred != NULL)
-						pred->suc = tmp;
+						pred->suc = next;
+
+					// link newElement with the suc of his suc
+					newElement->suc = next->suc;
+
+					// link the suc of newElement to newElement
+					next->suc = newElement;
+
+					// Condition to update lHead only 1 time
+					if (newElement->n == lHead->n)
+						lHead = next;
 
 					// Update the new pred
-					pred = tmp;
-					pred->suc = tmp->suc;
+					pred = next;
 				}
 				else
 					break;
 			}
-			// Reset pred for next insertion
+			// Reset pred for the next insertion
 			pred = NULL;
 		}
+	}
+
+	// Print all values of the list
+	if (0)
+	{
+		printf(YELLOW "\n\nPrint all values of the list : \n" RESET);
+		printList(lHead);
 	}
 
 	// CREATION OF THE HUFFMAN TREE
@@ -91,6 +95,10 @@ void buildCodeHuffman(int *frequencies, char **HuffmanDico)
 	{
 		// Get the 2 min nodes
 		minNodes_t minNodes = getMin(lHead);
+
+		// printf(YELLOW "mins retrieved : \n" RESET);
+		// printf("min1 : %c|%d\n", minNodes.min1->S, minNodes.min1->F);
+		// printf("min2 : %c|%d\n", minNodes.min2->S, minNodes.min2->F);
 
 		// Give to mins a binary value (part of their code)
 		minNodes.min1->code = (char *)malloc(sizeof(char));
@@ -116,23 +124,34 @@ void buildCodeHuffman(int *frequencies, char **HuffmanDico)
 		}
 	}
 
+	// Print all values of the list
+	if (0)
+	{
+		printf(YELLOW "\n\nPrint all values of the list : \n" RESET);
+		printList(lHead);
+	}
+
 	// CONSTRUCT THE CODE FOR EACH NODE
 	lHead->n->code = (char *)malloc(sizeof(char));
 	lHead->n->code = "";
 
 	getCode(lHead->n, HuffmanDico);
 
-	// Free all datas of the list
-	while (lHead->n != NULL)
-	{
-		if (lHead->suc == NULL)
-			break;
-		lHead = destroyList(lHead);
-	}
+	printf(YELLOW "\nFree all datas of the list : \n" RESET);
+	// All values have already been freed but the head
+	freeNodes(lHead->n);
+	free(lHead);
 }
 
 unsigned char *encodeHuffman(char *str, char **HuffmanDico)
 {
+	printf("in encode\n");
+	for (int i = 0; i < 128; i++)
+	{
+		if (HuffmanDico[i] != NULL)
+			printf("%d|%c : %s\n", i, i, HuffmanDico[i]);
+	}
+
 	unsigned char *res = (unsigned char *)malloc(sizeof(unsigned char));
 	res[0] = 0;
 	int size = 0;

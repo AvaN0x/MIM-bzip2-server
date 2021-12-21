@@ -32,7 +32,7 @@ list_t *listConstruct(node_t *N);
  * @param L The list element to copy
  * @return list_t* The copy
  */
-list_t *listCpy(list_t *L);
+list_t *listCpy(list_t *dest, list_t *src);
 
 /**
  * @brief Constructor of an empty list
@@ -41,13 +41,7 @@ list_t *listCpy(list_t *L);
  */
 list_t *emptyListCons();
 
-/**
- * @brief Free a listElement and goto next one
- *
- * @param L The list element to free
- * @return list_t* Next value
- */
-list_t *destroyList(list_t *L);
+void freeNodes(node_t *node);
 
 /**
  * @brief Remove 2 mins from the list and replace it by their parent

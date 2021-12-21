@@ -138,7 +138,7 @@ int main(int argc, char const *argv[])
     //--------------//
     // Test huffman //
     //--------------//
-    if (0)
+    // if (0)
     {
         printf(FONT_YELLOW "ENCODE HUFFMAN\n" FONT_DEFAULT);
         // tmp TODO RLE
@@ -166,6 +166,9 @@ int main(int argc, char const *argv[])
         char *HuffmanDico[128] = {};
         // Build the code for each caracter where freq > 0
         buildCodeHuffman(dico, HuffmanDico);
+
+        // Print values
+        printf("in server\n");
         for (int i = 0; i < 128; i++)
             if (HuffmanDico[i] != NULL)
                 printf("%d|%c : %s\n", i, i, HuffmanDico[i]);

@@ -21,6 +21,8 @@ node_t *consNode(symbol_t Sy, frequence_t Freq)
 
 char *toStringNode(node_t *N)
 {
+    if (N == NULL)
+        return "Noeud (NULL)";
     char *buffer = malloc(sizeof(char) * 100);
     sprintf(buffer, "Noeud [Symbole : %d(%c) | Frequence : %d | Code : %s]", N->S, (N->S == '\0' ? ' ' : N->S), N->F, N->code);
     return buffer;
