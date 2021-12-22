@@ -7,31 +7,9 @@
 #include "node.h"
 #include <unistd.h>
 
-list_t *listCpy(list_t *dest, list_t *src)
-{
-    assert(src != NULL);
-    if (dest == NULL)
-        dest = (list_t *)malloc(sizeof(list_t));
-
-    if (dest->n == NULL)
-        dest->n = (node_t *)malloc(sizeof(node_t));
-
-    if (src->n == NULL)
-        dest->n = NULL;
-    else
-        dest->n = memcpy(dest->n, src->n, sizeof(node_t));
-
-    if (dest->suc == NULL)
-        dest->suc = (list_t *)malloc(sizeof(list_t));
-
-    dest->suc = src->suc;
-
-    return dest;
-}
-
 list_t *listConstruct(node_t *N)
 {
-    list_t *list = malloc(sizeof(list_t));
+    list_t *list = (list_t *)malloc(sizeof(list_t));
     list->n = N;
     list->suc = NULL;
     return list;
@@ -39,7 +17,7 @@ list_t *listConstruct(node_t *N)
 
 list_t *emptyListCons()
 {
-    list_t *list = malloc(sizeof(list_t));
+    list_t *list = (list_t *)malloc(sizeof(list_t));
     list->n = NULL;
     list->suc = NULL;
     return list;
@@ -114,6 +92,7 @@ list_t *removeMins(list_t *current, minNodes_t *minNodes, node_t *nNode)
                         newElement->suc = current->suc;
                         pred->suc = newElement;
                         free(current);
+                        current = NULL;
                     }
                 }
                 /*
@@ -124,6 +103,7 @@ list_t *removeMins(list_t *current, minNodes_t *minNodes, node_t *nNode)
                 {
                     pred->suc = current->suc;
                     free(current);
+                    current = NULL;
                 }
             }
             // If it's the head of the list
@@ -141,6 +121,7 @@ list_t *removeMins(list_t *current, minNodes_t *minNodes, node_t *nNode)
                         newElement->suc = current->suc;
                         head = newElement;
                         free(current);
+                        current = NULL;
                     }
                     /*
                      * If it's not the first value to be removed
@@ -151,6 +132,7 @@ list_t *removeMins(list_t *current, minNodes_t *minNodes, node_t *nNode)
                     {
                         head = current->suc;
                         free(current);
+                        current = NULL;
                     }
                 }
                 // If no suc just declare new head as new node
@@ -195,14 +177,24 @@ void freeNodes(node_t *node)
 {
 
     if (node->up != NULL)
+    {
         freeNodes(node->up);
+        node->up = NULL;
+    }
     if (node->down != NULL)
+    {
         freeNodes(node->down);
+        node->down = NULL;
+    }
 
-    printNode(node);
+    // printNode(node);
     if (strcmp(node->code, "") != 0)
+    {
         free(node->code);
+        node->code = NULL;
+    }
     free(node);
+    node = NULL;
 }
 
 char *toStringList(list_t *L)
@@ -220,7 +212,10 @@ char *toStringList(list_t *L)
 
 void printListElement(list_t *L)
 {
-    printf("%s\n", toStringList(L));
+    char *str = toStringList(L);
+    printf("%s\n", str);
+    free(str);
+    str = NULL;
 }
 
 void printList(list_t *L)
@@ -228,30 +223,34 @@ void printList(list_t *L)
     list_t *tmp = L;
     while (tmp != NULL)
     {
-        printf("%s\n", toStringList(tmp));
+        char *str = toStringList(tmp);
+        printf("%s\n", str);
+        free(str);
+        str = NULL;
         tmp = tmp->suc;
     }
 }
 
 void getCode(node_t *node, char **huffmanDico)
 {
+    int lengthCode = strlen(node->code);
     if (node->up != NULL)
     {
-        node->up->code = (char *)realloc(node->up->code, 1 + sizeof(char) * strlen(node->code));
+        node->up->code = (char *)realloc(node->up->code, 1 + sizeof(char) * lengthCode);
         node->up->code = strcat(node->up->code, node->code);
         getCode(node->up, huffmanDico);
     }
     if (node->down != NULL)
     {
-        node->down->code = (char *)realloc(node->down->code, 1 + sizeof(char) * strlen(node->code));
+        node->down->code = (char *)realloc(node->down->code, 1 + sizeof(char) * lengthCode);
         node->down->code = strcat(node->down->code, node->code);
         getCode(node->down, huffmanDico);
     }
 
     if (node->down == NULL && node->up == NULL)
     {
-        huffmanDico[node->S] = (char *)malloc(sizeof(char) * strlen(node->code));
-        strcpy(huffmanDico[node->S], reverseCode(node->code));
+        huffmanDico[node->S] = (char *)malloc(sizeof(char) * lengthCode);
+        strncpy(huffmanDico[node->S], reverseCode(node->code), lengthCode);
     }
 }
 

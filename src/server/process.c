@@ -14,7 +14,7 @@
 
 void processFile(char *fileName)
 {
-    char *tmpFileName = malloc(sizeof(char) * (strlen(fileName) + 4));
+    char *tmpFileName = (char *)malloc(sizeof(char) * (strlen(fileName) + 4));
     strcpy(tmpFileName, "res/");
     strcat(tmpFileName, fileName);
 

@@ -27,7 +27,7 @@ int main(int argc, char const *argv[])
     {
         char *fileName = "mississippi.txt";
 
-        char *tmpFileName = malloc(sizeof(char) * (strlen(fileName) + 4));
+        char *tmpFileName = (char *)malloc(sizeof(char) * (strlen(fileName) + 4));
         strcpy(tmpFileName, "res/");
         strcat(tmpFileName, fileName);
 
@@ -168,18 +168,30 @@ int main(int argc, char const *argv[])
         buildCodeHuffman(dico, HuffmanDico);
 
         // Print values
-        printf("in server\n");
-        for (int i = 0; i < 128; i++)
-            if (HuffmanDico[i] != NULL)
-                printf("%d|%c : %s\n", i, i, HuffmanDico[i]);
+        // printf("in server\n");
+        // for (int i = 0; i < 128; i++)
+        //     if (HuffmanDico[i] != NULL)
+        //         printf("%d|%c : %s\n", i, i, HuffmanDico[i]);
 
         unsigned char *encoded = encodeHuffman("OPLS", HuffmanDico);
+
         printf(FONT_YELLOW "\nencoded is " FONT_DEFAULT);
         for (int i = 0; i < strlen((char *)encoded); i++)
             printf("%u ", encoded[i]);
         printf("\n");
-        char *decoded = decodeHuffman((char *)encoded, HuffmanDico);
+
+        char *decoded = decodeHuffman(encoded, HuffmanDico);
         printf(FONT_YELLOW "\ndecoded is %s\n" FONT_DEFAULT, decoded);
+
+        free(encoded);
+        encoded = NULL;
+        free(decoded);
+        decoded = NULL;
+        for (int i = 0; i < 128; i++)
+        {
+            free(HuffmanDico[i]);
+            HuffmanDico[i] = NULL;
+        }
     }
 
     if (0)

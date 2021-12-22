@@ -137,81 +137,81 @@ void buildCodeHuffman(int *frequencies, char **HuffmanDico)
 
 	getCode(lHead->n, HuffmanDico);
 
-	printf(YELLOW "\nFree all datas of the list : \n" RESET);
+	// printf(YELLOW "\nFree all datas of the list : \n" RESET);
 	// All values have already been freed but the head
 	freeNodes(lHead->n);
 	free(lHead);
+	lHead = NULL;
 }
 
 unsigned char *encodeHuffman(char *str, char **HuffmanDico)
 {
-	printf("in encode\n");
-	for (int i = 0; i < 128; i++)
-	{
-		if (HuffmanDico[i] != NULL)
-			printf("%d|%c : %s\n", i, i, HuffmanDico[i]);
-	}
+	const int usize = sizeof(unsigned char);
+	int resSize = 0;
 
-	unsigned char *res = (unsigned char *)malloc(sizeof(unsigned char));
-	res[0] = 0;
-	int size = 0;
-	// printf("String given is : %s\n", str);
-	// The byte that will be saved
-	unsigned char toSend = 0;
+	unsigned char *res = (unsigned char *)malloc(usize * (resSize + 1));
+	res[resSize] = 0;
 	int count = 0;
+
 	FILE *binFile = fopen("res/huffmanEncoded.bin", "wb");
 	assert(binFile != NULL);
 
-	for (int i = 0; i < strlen(str); i++)
+	int lengthStr = strlen(str);
+	for (int i = 0; i < lengthStr; i++)
 	{
 		// get the code of the current caracter of the string
 		char *code = HuffmanDico[(int)str[i]];
 		// printf("Code of %c(%d) is %s\n", str[i], str[i], code);
 
-		for (int j = 0; j < strlen(code); j++)
+		int lengthCode = strlen(code);
+		for (int j = 0; j < lengthCode; j++)
 		{
-			// printf("toSend was : %d\n", toSend);
-			int myBitInt = code[j] - '0'; // Code is composed of '0' and '1' so we transform that in bit
-			// printf("current bit is %d\n", myBitInt);
-			toSend <<= 1;
-			toSend |= myBitInt;
-			// printf("toSend is now : %d(%c)\n", toSend, toSend);
+			// Code is composed of '0' and '1' so we transform that in bit
+			unsigned char myBitInt = code[j] - '0';
+
+			res[resSize] <<= 1;
+			res[resSize] |= myBitInt;
+
 			count++;
 			if (count == 8)
 			{
-				count = 0;
-				// printf("count = 8, write toSend into file\n");
-				assert(fwrite(&toSend, sizeof(unsigned char), 1, binFile) == 1);
+				// printf(YELLOW "toSend is %u\n" RESET, res[resSize]);
+				assert(fwrite(&res[resSize], usize, 1, binFile) == 1);
 
-				res = (unsigned char *)realloc(res, (1 + size) * sizeof(unsigned char));
-				res[size++] = toSend;
-				toSend = 0;
+				res = (unsigned char *)realloc(res, usize * (resSize + 1));
+				res[++resSize] = 0;
+
+				count = 0;
 			}
-			// printf("\n");
 		}
-		// printf("\n");
 	}
+
 	if (count != 0)
 	{
-		// printf("count is %d\n", count);
+		// We want that the bits are high ordered and non low ordered
 		for (int i = 0; i < count; i++)
-			toSend <<= 1;
-		// printf("count != 0, write toSend into file\n");
-		assert(fwrite(&toSend, sizeof(unsigned char), 1, binFile) == 1);
+			res[resSize] <<= 1;
 
-		res = (unsigned char *)realloc(res, (1 + size) * sizeof(unsigned char));
-		res[size++] = toSend;
+		assert(fwrite(&res[resSize], usize, 1, binFile) == 1);
 	}
+
 	assert(fclose(binFile) == 0);
+
+	// unsigned char * are created without \0 at the end
+	res = (unsigned char *)realloc(res, usize * (resSize + 1));
+	res[++resSize] = 0;
+
 	return res;
 }
 
-char *decodeHuffman(char *todo, char **HuffmanDico)
+char *decodeHuffman(unsigned char *str, char **HuffmanDico)
 {
 	FILE *binFile = fopen("res/huffmanEncoded.bin", "rb");
+	// TODO USE PARAMETER STR
 	assert(binFile != NULL);
 
 	char *res = NULL;
+	int resSize = 0;
 
 	// All caracters are initially candidates
 	int candidatList[128];
@@ -223,10 +223,10 @@ char *decodeHuffman(char *todo, char **HuffmanDico)
 	int cursor = -1;
 
 	unsigned char buffer = 0;
-	while (fread(&buffer, sizeof(unsigned char), 1, binFile) == 1)
+	int usize = sizeof(unsigned char);
+	while (fread(&buffer, usize, 1, binFile) == 1)
 	{
 		// printf(YELLOW "\nbuffer is %d\n" RESET, buffer);
-
 		for (int i = 7; i >= 0; i--)
 		{
 			// printf(YELLOW "I = %d\n" RESET, i);
@@ -239,8 +239,10 @@ char *decodeHuffman(char *todo, char **HuffmanDico)
 
 			for (int j = 0; j < 128; j++)
 			{
+				// If char has a code
 				if (HuffmanDico[j] != NULL)
 				{
+					// If char is candidate and his code is correct
 					if (candidatList[j] == 1 && (HuffmanDico[j][cursor] - '0') != codeBit)
 					{
 						candidatList[j] = 0;
@@ -264,17 +266,18 @@ char *decodeHuffman(char *todo, char **HuffmanDico)
 
 				if (nbCandidat == 1)
 				{
+					// printf("candidatIdx is %d(%c)\n", candidatIdx, candidatIdx);
 					if (res == NULL)
 					{
-						res = (char *)malloc(sizeof(char));
-						res[0] = (char)candidatIdx;
+						res = (char *)malloc(sizeof(char) * 2);
+						res[resSize++] = (char)candidatIdx;
+						res[resSize++] = '\0';
 					}
 					else
 					{
-						// printf("strlen(res) is : %ld\n", strlen(res));
-						res = realloc(res, (strlen(res) + 1) * sizeof(char));
-						res[strlen(res)] = (char)candidatIdx;
-						// printf("strlen(res) is : %ld\n", strlen(res));
+						res = realloc(res, (resSize + 1) * sizeof(char));
+						res[resSize - 1] = (char)candidatIdx;
+						res[resSize++] = '\0';
 					}
 
 					for (int z = 0; z < 128; z++)
