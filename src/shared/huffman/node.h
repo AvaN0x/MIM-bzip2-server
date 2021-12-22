@@ -14,18 +14,27 @@ typedef struct elem_node_t
 } node_t;
 
 /**
- * préférez les fonctions d'accès en consultation et modification
- * de manière à ne faire qu'un changement si l'on change de T.A.
+ * @brief Create a new node with a symbol and a frequence
  *
- * Plus tard, vous verrez les objets et leurs patrons (templates)
+ * @param Sy The symbol
+ * @param Freq The frequency
+ * @return node_t*
  */
-
-node_t *emptyNode();
-
 node_t *consNode(symbol_t Sy, frequence_t Freq);
 
+/**
+ * @brief Create a sring from a node
+ *
+ * @param N The node
+ * @return char*
+ */
 char *toStringNode(node_t *N);
 
+/**
+ * @brief Print a node
+ *
+ * @param N The node
+ */
 void printNode(node_t *N);
 
 #endif

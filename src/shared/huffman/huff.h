@@ -17,7 +17,7 @@ void buildCodeHuffman(int *frequencies, char **HuffmanDico);
  * @param str The string to encode
  * @param HuffmanDico The dictionnary
  *
- * @return char* The encoded string
+ * @return unsigned char* The encoded string
  */
 unsigned char *encodeHuffman(char *str, char **HuffmanDico);
 
@@ -29,6 +29,6 @@ unsigned char *encodeHuffman(char *str, char **HuffmanDico);
  *
  * @return char* The decoded string
  */
-char *decodeHuffman(char *str, char **HuffmanDico);
+char *decodeHuffman(unsigned char *str, char **HuffmanDico);
 
 #endif

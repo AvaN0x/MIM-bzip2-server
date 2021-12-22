@@ -27,14 +27,6 @@ typedef struct
 list_t *listConstruct(node_t *N);
 
 /**
- * @brief Create a copy of the list element
- *
- * @param L The list element to copy
- * @return list_t* The copy
- */
-list_t *listCpy(list_t *L);
-
-/**
  * @brief Constructor of an empty list
  *
  * @return list_t*
@@ -42,12 +34,11 @@ list_t *listCpy(list_t *L);
 list_t *emptyListCons();
 
 /**
- * @brief Free a listElement and goto next one
+ * @brief Free a node (+code) and all his children (+code)
  *
- * @param L The list element to free
- * @return list_t* Next value
+ * @param node The node to start the free
  */
-list_t *destroyList(list_t *L);
+void freeNodes(node_t *node);
 
 /**
  * @brief Remove 2 mins from the list and replace it by their parent
@@ -69,7 +60,7 @@ list_t *removeMins(list_t *L, minNodes_t *minNodes, node_t *nNode);
 minNodes_t getMin(list_t *L);
 
 /**
- * @brief Print the value of the node + suc
+ * @brief Create a tring from the value of the node + suc
  *
  * @param L The list element to be transformed
  * @return char* The string

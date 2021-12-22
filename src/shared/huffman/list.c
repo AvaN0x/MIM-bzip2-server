@@ -1,22 +1,15 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
 #include "list.h"
 #include "TA.h"
 #include "node.h"
 #include <unistd.h>
 
-list_t *listCpy(list_t *L)
-{
-    list_t *list = malloc(sizeof(list_t));
-    list->n = L->n;
-    list->suc = L->suc;
-    return list;
-}
-
 list_t *listConstruct(node_t *N)
 {
-    list_t *list = malloc(sizeof(list_t));
+    list_t *list = (list_t *)malloc(sizeof(list_t));
     list->n = N;
     list->suc = NULL;
     return list;
@@ -24,7 +17,7 @@ list_t *listConstruct(node_t *N)
 
 list_t *emptyListCons()
 {
-    list_t *list = malloc(sizeof(list_t));
+    list_t *list = (list_t *)malloc(sizeof(list_t));
     list->n = NULL;
     list->suc = NULL;
     return list;
@@ -32,13 +25,13 @@ list_t *emptyListCons()
 
 minNodes_t getMin(list_t *L)
 {
-    list_t *tmp = listCpy(L);
-    minNodes_t minNodes;
-    minNodes.min1 = emptyNode();
-    minNodes.min1->F = 99999;
-    minNodes.min2 = emptyNode();
-    minNodes.min2->F = 99999;
+    list_t *tmp = L;
 
+    minNodes_t minNodes;
+    minNodes.min1 = NULL;
+    minNodes.min2 = NULL;
+
+    // If only 2 values left
     if (tmp->suc->suc == NULL)
     {
         minNodes.min1 = tmp->n;
@@ -47,12 +40,11 @@ minNodes_t getMin(list_t *L)
         return minNodes;
     }
 
-    while (tmp->n != NULL)
+    while (tmp != NULL && tmp->n != NULL)
     {
-        // Get the min
-        if (minNodes.min1->F == 99999)
+        if (minNodes.min1 == NULL)
             minNodes.min1 = tmp->n;
-        else if (minNodes.min2->F == 99999)
+        else if (minNodes.min2 == NULL)
             minNodes.min2 = tmp->n;
         else if (tmp->n->F <= minNodes.min1->F)
         {
@@ -61,33 +53,31 @@ minNodes_t getMin(list_t *L)
             minNodes.min1 = tmp->n;
         }
 
-        if (tmp->suc == NULL)
-            break;
         tmp = tmp->suc;
     }
 
     return minNodes;
 }
 
-list_t *removeMins(list_t *L, minNodes_t *minNodes, node_t *nNode)
+list_t *removeMins(list_t *current, minNodes_t *minNodes, node_t *nNode)
 {
     // Create a new element in first position
     list_t *newElement = listConstruct(nNode);
     // Define first element as newElement
-    list_t *head = listCpy(L);
+    list_t *head = current;
     list_t *pred = NULL;
 
     int removed = 0;
 
-    while (removed < 2 && L != NULL)
+    while (removed < 2 && current != NULL)
     {
         // If current list element is one of the mins
         // In this condition, we just remove the min and reconnect nodes for each situation
-        // values of pred, head, L will be updated after
-        if (L->n == minNodes->min1 || L->n == minNodes->min2)
+        // values of pred, head, current will be updated after
+        if (current->n == minNodes->min1 || current->n == minNodes->min2)
         {
             // If it's not the head of the list
-            if (L->n != head->n)
+            if (current->n != head->n)
             {
                 /*
                  * If it's the first value to be removed
@@ -96,11 +86,13 @@ list_t *removeMins(list_t *L, minNodes_t *minNodes, node_t *nNode)
                  */
                 if (removed == 0)
                 {
-                    if (L->suc != NULL)
+                    if (current->suc != NULL)
                     {
                         // Connect new node to suc
-                        newElement->suc = L->suc;
+                        newElement->suc = current->suc;
                         pred->suc = newElement;
+                        free(current);
+                        current = NULL;
                     }
                 }
                 /*
@@ -109,13 +101,15 @@ list_t *removeMins(list_t *L, minNodes_t *minNodes, node_t *nNode)
                  */
                 else
                 {
-                    pred->suc = L->suc;
+                    pred->suc = current->suc;
+                    free(current);
+                    current = NULL;
                 }
             }
             // If it's the head of the list
             else
             {
-                if (L->suc != NULL)
+                if (current->suc != NULL)
                 {
                     /*
                      * If it's the first value to be removed
@@ -124,8 +118,10 @@ list_t *removeMins(list_t *L, minNodes_t *minNodes, node_t *nNode)
                      */
                     if (removed == 0)
                     {
-                        newElement->suc = L->suc;
+                        newElement->suc = current->suc;
                         head = newElement;
+                        free(current);
+                        current = NULL;
                     }
                     /*
                      * If it's not the first value to be removed
@@ -134,7 +130,9 @@ list_t *removeMins(list_t *L, minNodes_t *minNodes, node_t *nNode)
                      */
                     else
                     {
-                        head = L->suc;
+                        head = current->suc;
+                        free(current);
+                        current = NULL;
                     }
                 }
                 // If no suc just declare new head as new node
@@ -144,9 +142,10 @@ list_t *removeMins(list_t *L, minNodes_t *minNodes, node_t *nNode)
             removed++;
         }
 
+        // UPDATE PRED AND CURRENT ELEMENT
         /*
          * If we are not on the head of the list (pred != NULL)
-         * And pred is on the head, update the new head (suc may have change)
+         * And pred is on the head, update the new head (suc may have changed)
          */
         if (pred != NULL && pred->n == head->n)
             head = pred;
@@ -154,8 +153,8 @@ list_t *removeMins(list_t *L, minNodes_t *minNodes, node_t *nNode)
         // If no values have been removed, go to next value
         if (removed == 0)
         {
-            pred = L;
-            pred->suc = L->suc;
+            pred = current;
+            pred->suc = current->suc;
         }
         /*
          * If the first value have been removed,
@@ -167,20 +166,35 @@ list_t *removeMins(list_t *L, minNodes_t *minNodes, node_t *nNode)
             pred->suc = newElement->suc;
         }
 
-        // Go to next value (L->suc or pred->suc)
-        L = pred == NULL ? L->suc : pred->suc;
+        // Go to next value (current->suc or pred->suc)
+        current = pred == NULL ? current->suc : pred->suc;
     }
 
     return head;
 }
-list_t *destroyList(list_t *L)
-{
-    if (L->n != NULL)
-        free(L->n);
 
-    list_t *next = L->suc;
-    free(L);
-    return next;
+void freeNodes(node_t *node)
+{
+
+    if (node->up != NULL)
+    {
+        freeNodes(node->up);
+        node->up = NULL;
+    }
+    if (node->down != NULL)
+    {
+        freeNodes(node->down);
+        node->down = NULL;
+    }
+
+    // printNode(node);
+    if (strcmp(node->code, "") != 0)
+    {
+        free(node->code);
+        node->code = NULL;
+    }
+    free(node);
+    node = NULL;
 }
 
 char *toStringList(list_t *L)
@@ -188,7 +202,7 @@ char *toStringList(list_t *L)
     if (L == NULL)
         return "Liste : [null]";
 
-    char *strSuc = (L->suc == NULL ? "[null]" : toStringNode(L->suc->n));
+    char *strSuc = (L->suc == NULL || L->suc->n == NULL ? "[null]" : toStringNode(L->suc->n));
     char *strNode = toStringNode(L->n);
 
     char *buffer = (char *)malloc(sizeof(char) * (50 + strlen(strNode) + strlen(strSuc)));
@@ -198,40 +212,45 @@ char *toStringList(list_t *L)
 
 void printListElement(list_t *L)
 {
-    printf("%s\n", toStringList(L));
+    char *str = toStringList(L);
+    printf("%s\n", str);
+    free(str);
+    str = NULL;
 }
 
 void printList(list_t *L)
 {
-    list_t *tmp = listCpy(L);
-    while (tmp->n != NULL)
+    list_t *tmp = L;
+    while (tmp != NULL)
     {
-        printf("%s\n", toStringList(tmp));
-        if (tmp->suc == NULL)
-            break;
+        char *str = toStringList(tmp);
+        printf("%s\n", str);
+        free(str);
+        str = NULL;
         tmp = tmp->suc;
     }
 }
 
 void getCode(node_t *node, char **huffmanDico)
 {
+    int lengthCode = strlen(node->code);
     if (node->up != NULL)
     {
-        node->up->code = (char *)realloc(node->up->code, 1 + sizeof(char) * strlen(node->code));
+        node->up->code = (char *)realloc(node->up->code, 1 + sizeof(char) * lengthCode);
         node->up->code = strcat(node->up->code, node->code);
         getCode(node->up, huffmanDico);
     }
     if (node->down != NULL)
     {
-        node->down->code = (char *)realloc(node->down->code, 1 + sizeof(char) * strlen(node->code));
+        node->down->code = (char *)realloc(node->down->code, 1 + sizeof(char) * lengthCode);
         node->down->code = strcat(node->down->code, node->code);
         getCode(node->down, huffmanDico);
     }
 
     if (node->down == NULL && node->up == NULL)
     {
-        huffmanDico[node->S] = (char *)malloc(sizeof(char) * strlen(node->code));
-        sprintf(huffmanDico[node->S], "%s", reverseCode(node->code));
+        huffmanDico[node->S] = (char *)malloc(sizeof(char) * lengthCode);
+        strncpy(huffmanDico[node->S], reverseCode(node->code), lengthCode);
     }
 }
 
