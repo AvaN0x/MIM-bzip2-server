@@ -7,9 +7,12 @@
 #include "node.h"
 #include <unistd.h>
 
+#include "count.h"
+
 list_t *listConstruct(node_t *N)
 {
     list_t *list = (list_t *)malloc(sizeof(list_t));
+    globalCounter++;
     list->n = N;
     list->suc = NULL;
     return list;
@@ -18,6 +21,7 @@ list_t *listConstruct(node_t *N)
 list_t *emptyListCons()
 {
     list_t *list = (list_t *)malloc(sizeof(list_t));
+    globalCounter++;
     list->n = NULL;
     list->suc = NULL;
     return list;
@@ -71,11 +75,26 @@ list_t *removeMins(list_t *current, minNodes_t *minNodes, node_t *nNode)
 
     while (removed < 2 && current != NULL)
     {
+        if (0)
+        {
+            printf("\nHead is : ");
+            printListElement(head);
+
+            printf("\nCurrent value is : ");
+            printListElement(current);
+
+            printf("\npred is : ");
+            printListElement(pred);
+
+            sleep(1);
+        }
+
         // If current list element is one of the mins
         // In this condition, we just remove the min and reconnect nodes for each situation
         // values of pred, head, current will be updated after
         if (current->n == minNodes->min1 || current->n == minNodes->min2)
         {
+            // printf("I'm a min\n");
             // If it's not the head of the list
             if (current->n != head->n)
             {
@@ -91,8 +110,6 @@ list_t *removeMins(list_t *current, minNodes_t *minNodes, node_t *nNode)
                         // Connect new node to suc
                         newElement->suc = current->suc;
                         pred->suc = newElement;
-                        free(current);
-                        current = NULL;
                     }
                 }
                 /*
@@ -100,11 +117,7 @@ list_t *removeMins(list_t *current, minNodes_t *minNodes, node_t *nNode)
                  * just make pred point to next value
                  */
                 else
-                {
                     pred->suc = current->suc;
-                    free(current);
-                    current = NULL;
-                }
             }
             // If it's the head of the list
             else
@@ -120,8 +133,6 @@ list_t *removeMins(list_t *current, minNodes_t *minNodes, node_t *nNode)
                     {
                         newElement->suc = current->suc;
                         head = newElement;
-                        free(current);
-                        current = NULL;
                     }
                     /*
                      * If it's not the first value to be removed
@@ -129,47 +140,39 @@ list_t *removeMins(list_t *current, minNodes_t *minNodes, node_t *nNode)
                      * update head to next element
                      */
                     else
-                    {
                         head = current->suc;
-                        free(current);
-                        current = NULL;
-                    }
                 }
                 // If no suc just declare new head as new node
                 else
                     head = newElement;
             }
             removed++;
+            free(current);
+            current = NULL;
+            globalCounter--;
         }
 
-        // UPDATE PRED AND CURRENT ELEMENT
-        /*
-         * If we are not on the head of the list (pred != NULL)
-         * And pred is on the head, update the new head (suc may have changed)
-         */
-        if (pred != NULL && pred->n == head->n)
-            head = pred;
+        if (removed == 2)
+            break;
 
-        // If no values have been removed, go to next value
-        if (removed == 0)
-        {
-            pred = current;
-            pred->suc = current->suc;
-        }
-        /*
-         * If the first value have been removed,
-         * then newElement has taken his place so pred is now newElement
-         */
-        if (removed == 1)
-        {
-            pred = newElement;
-            pred->suc = newElement->suc;
-        }
+        if (pred == NULL)
+            if (removed == 0)
+                pred = current;
+            else
+                pred = newElement;
+        else
+            pred = pred->suc;
 
-        // Go to next value (current->suc or pred->suc)
-        current = pred == NULL ? current->suc : pred->suc;
+        current = pred->suc;
     }
 
+    // Check values after each iteration
+    if (0)
+    {
+        printf("Print all values\n");
+        printList(head);
+        sleep(1);
+    }
     return head;
 }
 
@@ -192,9 +195,11 @@ void freeNodes(node_t *node)
     {
         free(node->code);
         node->code = NULL;
+        globalCounter--;
     }
     free(node);
     node = NULL;
+    globalCounter--;
 }
 
 char *toStringList(list_t *L)
@@ -205,7 +210,8 @@ char *toStringList(list_t *L)
     char *strSuc = (L->suc == NULL || L->suc->n == NULL ? "[null]" : toStringNode(L->suc->n));
     char *strNode = toStringNode(L->n);
 
-    char *buffer = (char *)malloc(sizeof(char) * (50 + strlen(strNode) + strlen(strSuc)));
+    char *buffer = (char *)malloc(sizeof(char) * (50 + strlen(strNode) + strlen(strSuc) + 1));
+    globalCounter++;
     sprintf(buffer, "Liste : [%s]\n\tsuc is : %s", strNode, strSuc);
     return buffer;
 }
@@ -214,8 +220,12 @@ void printListElement(list_t *L)
 {
     char *str = toStringList(L);
     printf("%s\n", str);
-    free(str);
-    str = NULL;
+    if (strcmp(str, "Liste : [null]") != 0)
+    {
+        free(str);
+        str = NULL;
+        globalCounter--;
+    }
 }
 
 void printList(list_t *L)
@@ -225,8 +235,12 @@ void printList(list_t *L)
     {
         char *str = toStringList(tmp);
         printf("%s\n", str);
-        free(str);
-        str = NULL;
+        if (strcmp(str, "Liste : [null]") != 0)
+        {
+            free(str);
+            str = NULL;
+            globalCounter--;
+        }
         tmp = tmp->suc;
     }
 }
@@ -250,6 +264,7 @@ void getCode(node_t *node, char **huffmanDico)
     if (node->down == NULL && node->up == NULL)
     {
         huffmanDico[node->S] = (char *)malloc(sizeof(char) * lengthCode);
+        globalCounter++;
         strncpy(huffmanDico[node->S], reverseCode(node->code), lengthCode);
     }
 }

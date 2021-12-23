@@ -13,10 +13,10 @@
 #include <ctype.h>
 #include <math.h>
 
+#include "count.h"
+
 #define YELLOW "\x1B[33m"
 #define RESET "\x1B[0m"
-
-// TODO TO FREE : EACH ELEMENT OF THE LIST
 
 void buildCodeHuffman(int *frequencies, char **HuffmanDico)
 {
@@ -33,7 +33,7 @@ void buildCodeHuffman(int *frequencies, char **HuffmanDico)
 		if (frequencies[i] == 0)
 			continue;
 
-		// printf(YELLOW "Caractere (%c|%d) de frequence %u \n" RESET, i, i, frequencies[i]);
+		printf(YELLOW "Caractere (%c|%d) de frequence %u \n" RESET, i, i, frequencies[i]);
 
 		S = i;
 		F = frequencies[i];
@@ -83,7 +83,7 @@ void buildCodeHuffman(int *frequencies, char **HuffmanDico)
 	}
 
 	// Print all values of the list
-	if (0)
+	// if (0)
 	{
 		printf(YELLOW "\n\nPrint all values of the list : \n" RESET);
 		printList(lHead);
@@ -96,15 +96,18 @@ void buildCodeHuffman(int *frequencies, char **HuffmanDico)
 		// Get the 2 min nodes
 		minNodes_t minNodes = getMin(lHead);
 
-		// printf(YELLOW "mins retrieved : \n" RESET);
-		// printf("min1 : %c|%d\n", minNodes.min1->S, minNodes.min1->F);
-		// printf("min2 : %c|%d\n", minNodes.min2->S, minNodes.min2->F);
+		printf(YELLOW "mins retrieved : \n" RESET);
+		printf("min1 : %c|%d\n", minNodes.min1->S, minNodes.min1->F);
+		printf("min2 : %c|%d\n", minNodes.min2->S, minNodes.min2->F);
 
 		// Give to mins a binary value (part of their code)
+		// Malloc the code because we don't already know the future code's lenght of each node
 		minNodes.min1->code = (char *)malloc(sizeof(char));
+		globalCounter++;
 		sprintf(minNodes.min1->code, "0");
 
 		minNodes.min2->code = (char *)malloc(sizeof(char));
+		globalCounter++;
 		sprintf(minNodes.min2->code, "1");
 
 		// Create the new node from the 2 min nodes. We don't care about the symbol given
@@ -112,6 +115,12 @@ void buildCodeHuffman(int *frequencies, char **HuffmanDico)
 		// Save the new node node as father of min nodes
 		nNode->down = minNodes.min1;
 		nNode->up = minNodes.min2;
+
+		// if (0)
+		{
+			printf("New node is : ");
+			printNode(nNode);
+		}
 
 		// Remove the 2 mins of the list
 		lHead = removeMins(lHead, &minNodes, nNode);
@@ -121,18 +130,18 @@ void buildCodeHuffman(int *frequencies, char **HuffmanDico)
 		{
 			printf(YELLOW "\n\nPrint all values of the list : \n" RESET);
 			printList(lHead);
+			sleep(2);
 		}
 	}
 
 	// Print all values of the list
-	if (0)
+	// if (0)
 	{
 		printf(YELLOW "\n\nPrint all values of the list : \n" RESET);
 		printList(lHead);
 	}
 
 	// CONSTRUCT THE CODE FOR EACH NODE
-	lHead->n->code = (char *)malloc(sizeof(char));
 	lHead->n->code = "";
 
 	getCode(lHead->n, HuffmanDico);
@@ -142,14 +151,16 @@ void buildCodeHuffman(int *frequencies, char **HuffmanDico)
 	freeNodes(lHead->n);
 	free(lHead);
 	lHead = NULL;
+	globalCounter--;
 }
 
-unsigned char *encodeHuffman(char *str, char **HuffmanDico)
+unsigned char *encodeHuffman(const char *str, char **HuffmanDico)
 {
 	const int usize = sizeof(unsigned char);
 	int resSize = 0;
 
 	unsigned char *res = (unsigned char *)malloc(usize * (resSize + 1));
+	globalCounter++;
 	res[resSize] = 0;
 	int count = 0;
 
@@ -157,6 +168,7 @@ unsigned char *encodeHuffman(char *str, char **HuffmanDico)
 	assert(binFile != NULL);
 
 	int lengthStr = strlen(str);
+	printf("lengthStr is %d\n", lengthStr);
 	for (int i = 0; i < lengthStr; i++)
 	{
 		// get the code of the current caracter of the string
@@ -197,7 +209,7 @@ unsigned char *encodeHuffman(char *str, char **HuffmanDico)
 
 	assert(fclose(binFile) == 0);
 
-	// unsigned char * are created without \0 at the end
+	// add \0 at the end
 	res = (unsigned char *)realloc(res, usize * (resSize + 1));
 	res[++resSize] = 0;
 
@@ -270,6 +282,7 @@ char *decodeHuffman(unsigned char *str, char **HuffmanDico)
 					if (res == NULL)
 					{
 						res = (char *)malloc(sizeof(char) * 2);
+						globalCounter++;
 						res[resSize++] = (char)candidatIdx;
 						res[resSize++] = '\0';
 					}
@@ -294,5 +307,6 @@ char *decodeHuffman(unsigned char *str, char **HuffmanDico)
 	}
 
 	assert(fclose(binFile) == 0);
+
 	return res;
 }

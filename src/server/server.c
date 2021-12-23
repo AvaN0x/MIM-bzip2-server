@@ -12,6 +12,8 @@
 #include "../shared/m2f/m2f.h"
 #include "../shared/rle/rle.h"
 
+#include "../shared/huffman/count.h"
+
 int main(int argc, char const *argv[])
 {
     // TODO when the full bzip2 encode and decode is working
@@ -28,6 +30,7 @@ int main(int argc, char const *argv[])
         char *fileName = "mississippi.txt";
 
         char *tmpFileName = (char *)malloc(sizeof(char) * (strlen(fileName) + 4));
+        globalCounter++;
         strcpy(tmpFileName, "res/");
         strcat(tmpFileName, fileName);
 
@@ -141,31 +144,37 @@ int main(int argc, char const *argv[])
     // if (0)
     {
         printf(FONT_YELLOW "ENCODE HUFFMAN\n" FONT_DEFAULT);
+        const char *S = "Bonjour je m'appelle Luc et je veux tester mes fonctions parce que sinon je ne sais pas si cela fonctionne correctment.";
         // tmp TODO RLE
         int dico[128] = {};
-        for (int i = 0; i < 128; i++)
-        {
-            switch (i)
-            {
-            case 0:
-                dico[i] = 3;
-                break;
-            case 1:
-                dico[i] = 2;
-                break;
-            case 3:
-            case 76:
-            case 79:
-            case 80:
-            case 83:
-                dico[i] = 1;
-                break;
-            }
-        }
+        int len = strlen(S);
+        for (int i = 0; i < len; i++)
+            dico[(int)S[i]]++;
+        // for (int i = 0; i < 128; i++)
+        // {
+        //     switch (i)
+        //     {
+        //     case 0:
+        //         dico[i] = 3;
+        //         break;
+        //     case 1:
+        //         dico[i] = 2;
+        //         break;
+        //     case 3:
+        //     case 76:
+        //     case 79:
+        //     case 80:
+        //     case 83:
+        //         dico[i] = 1;
+        //         break;
+        //     }
+        // }
 
         char *HuffmanDico[128] = {};
         // Build the code for each caracter where freq > 0
         buildCodeHuffman(dico, HuffmanDico);
+
+        printf(FONT_YELLOW "AFTER BUILD HUFFMAN CODE GLOBAL COUNT IS %d\n" FONT_DEFAULT, globalCounter);
 
         // Print values
         // printf("in server\n");
@@ -173,7 +182,9 @@ int main(int argc, char const *argv[])
         //     if (HuffmanDico[i] != NULL)
         //         printf("%d|%c : %s\n", i, i, HuffmanDico[i]);
 
-        unsigned char *encoded = encodeHuffman("OPLS", HuffmanDico);
+        unsigned char *encoded = encodeHuffman(S, HuffmanDico);
+
+        printf(FONT_YELLOW "AFTER ENCODE GLOBAL COUNT IS %d\n" FONT_DEFAULT, globalCounter);
 
         printf(FONT_YELLOW "\nencoded is " FONT_DEFAULT);
         for (int i = 0; i < strlen((char *)encoded); i++)
@@ -184,13 +195,16 @@ int main(int argc, char const *argv[])
         printf(FONT_YELLOW "\ndecoded is %s\n" FONT_DEFAULT, decoded);
 
         free(encoded);
+        globalCounter--;
         encoded = NULL;
         free(decoded);
+        globalCounter--;
         decoded = NULL;
         for (int i = 0; i < 128; i++)
         {
             free(HuffmanDico[i]);
             HuffmanDico[i] = NULL;
+            globalCounter--;
         }
     }
 
