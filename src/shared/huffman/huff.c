@@ -53,7 +53,7 @@ void buildCodeHuffman(int *frequencies, char **HuffmanDico)
 			while (newElement->suc != NULL)
 			{
 				// Swap if freq is lower than the next one
-				if (newElement->n->F < newElement->suc->n->F)
+				if (newElement->n->F < newElement->suc->n->F || (newElement->n->S < newElement->suc->n->S && newElement->n->F < newElement->suc->n->F))
 				{
 					list_t *next = newElement->suc;
 
@@ -111,7 +111,7 @@ void buildCodeHuffman(int *frequencies, char **HuffmanDico)
 		sprintf(minNodes.min2->code, "1");
 
 		// Create the new node from the 2 min nodes. We don't care about the symbol given
-		node_t *nNode = consNode(' ', minNodes.min1->F + minNodes.min2->F);
+		node_t *nNode = consNode('\0', minNodes.min1->F + minNodes.min2->F);
 		// Save the new node node as father of min nodes
 		nNode->down = minNodes.min1;
 		nNode->up = minNodes.min2;
@@ -126,16 +126,16 @@ void buildCodeHuffman(int *frequencies, char **HuffmanDico)
 		lHead = removeMins(lHead, &minNodes, nNode);
 
 		// Print all values of the list
-		if (0)
+		// if (0)
 		{
 			printf(YELLOW "\n\nPrint all values of the list : \n" RESET);
 			printList(lHead);
-			sleep(2);
+			// sleep(2);
 		}
 	}
 
 	// Print all values of the list
-	// if (0)
+	if (0)
 	{
 		printf(YELLOW "\n\nPrint all values of the list : \n" RESET);
 		printList(lHead);
@@ -274,7 +274,7 @@ char *decodeHuffman(unsigned char *str, char **HuffmanDico)
 
 				// debug
 				// if (candidatList[j] == 1)
-				// 	printf("%d\n", j);
+				// 	printf("%d|%c\n", j, j);
 
 				if (nbCandidat == 1)
 				{

@@ -38,8 +38,8 @@ minNodes_t getMin(list_t *L)
     // If only 2 values left
     if (tmp->suc->suc == NULL)
     {
-        minNodes.min1 = tmp->n;
-        minNodes.min2 = tmp->suc->n;
+        minNodes.min1 = tmp->suc->n;
+        minNodes.min2 = tmp->n;
 
         return minNodes;
     }

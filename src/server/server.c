@@ -144,7 +144,8 @@ int main(int argc, char const *argv[])
     // if (0)
     {
         printf(FONT_YELLOW "ENCODE HUFFMAN\n" FONT_DEFAULT);
-        const char *S = "Bonjour je m'appelle Luc et je veux tester mes fonctions parce que sinon je ne sais pas si cela fonctionne correctment.";
+        const char *S = "exemple,de,codage,de,huffman";
+        // const char *S = "Bonjour je m'appelle Luc et je veux tester mes fonctions parce que sinon je ne sais pas si cela fonctionne correctment.";
         // tmp TODO RLE
         int dico[128] = {};
         int len = strlen(S);
@@ -177,10 +178,10 @@ int main(int argc, char const *argv[])
         printf(FONT_YELLOW "AFTER BUILD HUFFMAN CODE GLOBAL COUNT IS %d\n" FONT_DEFAULT, globalCounter);
 
         // Print values
-        // printf("in server\n");
-        // for (int i = 0; i < 128; i++)
-        //     if (HuffmanDico[i] != NULL)
-        //         printf("%d|%c : %s\n", i, i, HuffmanDico[i]);
+        printf("in server\n");
+        for (int i = 0; i < 128; i++)
+            if (HuffmanDico[i] != NULL)
+                printf("%d|%c : %s\n", i, i, HuffmanDico[i]);
 
         unsigned char *encoded = encodeHuffman(S, HuffmanDico);
 
