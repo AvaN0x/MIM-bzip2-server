@@ -5,6 +5,7 @@
 #include "../buffer.h"
 #include "../huffman/count.h"
 
+// TODO @LucBrungard realloc : invalid next size
 void encodeRLE(char *S, int len, char **res, int *resLen)
 {
     int shift = 0;

@@ -31,8 +31,7 @@
  */
 int main(int argc, char const *argv[])
 {
-    //#region Tests
-    // if (0)
+    if (0)
     {
         // if (0)
         {
