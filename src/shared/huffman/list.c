@@ -35,43 +35,84 @@ minNodes_t getMin(list_t *L)
     minNodes.min1 = NULL;
     minNodes.min2 = NULL;
 
-    // If only 2 values left
-    if (tmp->suc->suc == NULL)
-    {
-        minNodes.min1 = tmp->suc->n;
-        minNodes.min2 = tmp->n;
-
-        return minNodes;
-    }
-
     while (tmp != NULL && tmp->n != NULL)
     {
+        if (minNodes.min1 != NULL && minNodes.min1->down == NULL && minNodes.min2 != NULL && minNodes.min2->down == NULL)
+            break;
+
         if (minNodes.min1 == NULL)
             minNodes.min1 = tmp->n;
-        else if (minNodes.min2 == NULL)
-            minNodes.min2 = tmp->n;
-        else if (tmp->n->F <= minNodes.min1->F)
+        else
         {
-            if (minNodes.min1->F <= minNodes.min2->F)
-                minNodes.min2 = minNodes.min1;
-            minNodes.min1 = tmp->n;
+            if (minNodes.min2 == NULL)
+            {
+                minNodes.min2 = tmp->n;
+            }
+            else if (tmp->n->F == minNodes.min2->F && tmp->n->lvl < minNodes.min2->lvl)
+                minNodes.min2 = tmp->n;
+            else if (tmp->n->F == minNodes.min1->F && tmp->n->lvl < minNodes.min1->lvl)
+            {
+                minNodes.min1 = minNodes.min2;
+                minNodes.min2 = tmp->n;
+            }
+        }
+
+        if (0)
+        {
+            if (minNodes.min1 != NULL)
+            {
+                printf("min1 : %c|%d\n", minNodes.min1->S, minNodes.min1->F);
+                printf("\t");
+                printNode(minNodes.min1->up);
+                printf("\t");
+                printNode(minNodes.min1->down);
+            }
+            else
+                printf("min1 is NULL\n");
+            if (minNodes.min2 != NULL)
+            {
+                printf("min2 : %c|%d\n", minNodes.min2->S, minNodes.min2->F);
+                printf("\t");
+                printNode(minNodes.min2->up);
+                printf("\t");
+                printNode(minNodes.min2->down);
+            }
+            else
+                printf("min2 is NULL\n");
         }
 
         tmp = tmp->suc;
     }
 
+    if (minNodes.min1->lvl < minNodes.min2->lvl)
+    {
+        node_t *tmp = minNodes.min1;
+        minNodes.min1 = minNodes.min2;
+        minNodes.min2 = tmp;
+    }
+
     return minNodes;
 }
 
-list_t *removeMins(list_t *current, minNodes_t *minNodes, node_t *nNode)
+list_t *removeMins(list_t *current, minNodes_t *minNodes)
 {
-    // Create a new element in first position
-    list_t *newElement = listConstruct(nNode);
     // Define first element as newElement
     list_t *head = current;
     list_t *pred = NULL;
 
     int removed = 0;
+
+    if (head->suc->suc == NULL)
+    {
+        free(head->suc);
+        head->suc = NULL;
+        globalCounter--;
+        free(head);
+        head = NULL;
+        globalCounter--;
+
+        return head;
+    }
 
     while (removed < 2 && current != NULL)
     {
@@ -89,63 +130,17 @@ list_t *removeMins(list_t *current, minNodes_t *minNodes, node_t *nNode)
             sleep(1);
         }
 
-        // If current list element is one of the mins
-        // In this condition, we just remove the min and reconnect nodes for each situation
-        // values of pred, head, current will be updated after
         if (current->n == minNodes->min1 || current->n == minNodes->min2)
         {
-            // printf("I'm a min\n");
-            // If it's not the head of the list
-            if (current->n != head->n)
-            {
-                /*
-                 * If it's the first value to be removed
-                 * insert the new node at this place
-                 * and connect pred and suc to new node
-                 */
-                if (removed == 0)
-                {
-                    if (current->suc != NULL)
-                    {
-                        // Connect new node to suc
-                        newElement->suc = current->suc;
-                        pred->suc = newElement;
-                    }
-                }
-                /*
-                 * If it's not the first value to be removed
-                 * just make pred point to next value
-                 */
-                else
-                    pred->suc = current->suc;
-            }
-            // If it's the head of the list
+            if (0)
+                printf("I'm a min !\n");
+
+            // Remove current from the list
+            if (current->n == head->n)
+                head = current->suc;
             else
-            {
-                if (current->suc != NULL)
-                {
-                    /*
-                     * If it's the first value to be removed
-                     * Insert new node and connect new node to suc
-                     * update head
-                     */
-                    if (removed == 0)
-                    {
-                        newElement->suc = current->suc;
-                        head = newElement;
-                    }
-                    /*
-                     * If it's not the first value to be removed
-                     * just declare head->suc as new head
-                     * update head to next element
-                     */
-                    else
-                        head = current->suc;
-                }
-                // If no suc just declare new head as new node
-                else
-                    head = newElement;
-            }
+                pred->suc = current->suc;
+
             removed++;
             free(current);
             current = NULL;
@@ -156,14 +151,19 @@ list_t *removeMins(list_t *current, minNodes_t *minNodes, node_t *nNode)
             break;
 
         if (pred == NULL)
+        {
             if (removed == 0)
-                pred = current;
+                pred = head;
+            else if (current != NULL)
+                pred = head;
             else
-                pred = newElement;
-        else
+                current = head;
+        }
+        else if (current != NULL)
             pred = pred->suc;
 
-        current = pred->suc;
+        if (pred != NULL)
+            current = pred->suc;
     }
 
     // Check values after each iteration
@@ -178,7 +178,6 @@ list_t *removeMins(list_t *current, minNodes_t *minNodes, node_t *nNode)
 
 void freeNodes(node_t *node)
 {
-
     if (node->up != NULL)
     {
         freeNodes(node->up);
@@ -204,15 +203,43 @@ void freeNodes(node_t *node)
 
 char *toStringList(list_t *L)
 {
-    if (L == NULL)
-        return "Liste : [null]";
-
-    char *strSuc = (L->suc == NULL || L->suc->n == NULL ? "[null]" : toStringNode(L->suc->n));
-    char *strNode = toStringNode(L->n);
-
-    char *buffer = (char *)malloc(sizeof(char) * (50 + strlen(strNode) + strlen(strSuc) + 1));
+    char *buffer = (char *)malloc(sizeof(char) * (1000));
     globalCounter++;
-    sprintf(buffer, "Liste : [%s]\n\tsuc is : %s", strNode, strSuc);
+    if (L == NULL)
+        sprintf(buffer, "Liste : [null]");
+    else
+    {
+        char *strSuc = (char *)malloc(sizeof(char) * 200);
+        if (L->suc == NULL)
+        {
+            sprintf(strSuc, "[null]");
+            globalCounter++;
+        }
+        else
+            strSuc = toStringNode(L->suc->n);
+        char *strNode = toStringNode(L->n);
+        char *strNode2 = toStringNode(L->n->down);
+        char *strNode3 = toStringNode(L->n->up);
+
+        sprintf(buffer, "Liste : [%s\n\t%s\n\t%s]\n\tsuc is : %s", strNode, strNode2, strNode3, strSuc);
+
+        free(strSuc);
+        strSuc = NULL;
+        globalCounter--;
+
+        free(strNode);
+        strNode = NULL;
+        globalCounter--;
+
+        free(strNode2);
+        strNode2 = NULL;
+        globalCounter--;
+
+        free(strNode3);
+        strNode3 = NULL;
+        globalCounter--;
+    }
+
     return buffer;
 }
 
@@ -220,12 +247,10 @@ void printListElement(list_t *L)
 {
     char *str = toStringList(L);
     printf("%s\n", str);
-    if (strcmp(str, "Liste : [null]") != 0)
-    {
-        free(str);
-        str = NULL;
-        globalCounter--;
-    }
+
+    free(str);
+    str = NULL;
+    globalCounter--;
 }
 
 void printList(list_t *L)
@@ -235,12 +260,11 @@ void printList(list_t *L)
     {
         char *str = toStringList(tmp);
         printf("%s\n", str);
-        if (strcmp(str, "Liste : [null]") != 0)
-        {
-            free(str);
-            str = NULL;
-            globalCounter--;
-        }
+
+        free(str);
+        str = NULL;
+        globalCounter--;
+
         tmp = tmp->suc;
     }
 }
@@ -265,14 +289,15 @@ void getCode(node_t *node, char **huffmanDico)
     {
         huffmanDico[node->S] = (char *)malloc(sizeof(char) * lengthCode);
         globalCounter++;
-        strncpy(huffmanDico[node->S], reverseCode(node->code), lengthCode);
+        char *reversedCode = reverseCode(node->code);
+        strncpy(huffmanDico[node->S], reversedCode, lengthCode);
     }
 }
 
 char *reverseCode(char *code)
 {
     int lgth = strlen(code) - 1;
-    for (int i = 0; i < lgth / 2; i++)
+    for (int i = 0; i <= lgth / 2; i++)
     {
         char tmp = code[i];
         code[i] = code[lgth - i];

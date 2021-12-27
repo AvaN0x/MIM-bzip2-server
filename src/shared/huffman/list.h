@@ -41,15 +41,14 @@ list_t *emptyListCons();
 void freeNodes(node_t *node);
 
 /**
- * @brief Remove 2 mins from the list and replace it by their parent
+ * @brief Remove 2 mins from the list
  *
  * @param L list_t* The list where we remove the mins
  * @param minNodes minNodes_t* Structure containing the mins
- * @param nNode node_t* The new node to insert
  *
  * @return list_t* The new head of the list
  */
-list_t *removeMins(list_t *L, minNodes_t *minNodes, node_t *nNode);
+list_t *removeMins(list_t *L, minNodes_t *minNodes);
 
 /**
  * @brief Get the 2 min nodes

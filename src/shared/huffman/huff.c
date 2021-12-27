@@ -33,11 +33,12 @@ void buildCodeHuffman(int *frequencies, char **HuffmanDico)
 		if (frequencies[i] == 0)
 			continue;
 
-		printf(YELLOW "Caractere (%c|%d) de frequence %u \n" RESET, i, i, frequencies[i]);
+		// printf(YELLOW "Caractere (%c|%d) de frequence %u \n" RESET, i, i, frequencies[i]);
 
 		S = i;
 		F = frequencies[i];
 		node_t *node = consNode(S, F);
+		node->lvl = 0;
 		list_t *newElement = listConstruct(node);
 
 		// Insert newElement at the begining
@@ -53,7 +54,7 @@ void buildCodeHuffman(int *frequencies, char **HuffmanDico)
 			while (newElement->suc != NULL)
 			{
 				// Swap if freq is lower than the next one
-				if (newElement->n->F < newElement->suc->n->F || (newElement->n->S < newElement->suc->n->S && newElement->n->F < newElement->suc->n->F))
+				if (newElement->n->F > newElement->suc->n->F || (newElement->n->S > newElement->suc->n->S && newElement->n->F >= newElement->suc->n->F))
 				{
 					list_t *next = newElement->suc;
 
@@ -80,10 +81,18 @@ void buildCodeHuffman(int *frequencies, char **HuffmanDico)
 			// Reset pred for the next insertion
 			pred = NULL;
 		}
+
+		// Print all values of the list after each insertion
+		if (0)
+		{
+			printf(YELLOW "\n\nPrint all values of the list : \n" RESET);
+			printList(lHead);
+			// sleep(5);
+		}
 	}
 
 	// Print all values of the list
-	// if (0)
+	if (0)
 	{
 		printf(YELLOW "\n\nPrint all values of the list : \n" RESET);
 		printList(lHead);
@@ -96,9 +105,20 @@ void buildCodeHuffman(int *frequencies, char **HuffmanDico)
 		// Get the 2 min nodes
 		minNodes_t minNodes = getMin(lHead);
 
-		printf(YELLOW "mins retrieved : \n" RESET);
-		printf("min1 : %c|%d\n", minNodes.min1->S, minNodes.min1->F);
-		printf("min2 : %c|%d\n", minNodes.min2->S, minNodes.min2->F);
+		if (0)
+		{
+			printf(YELLOW "mins to remove : \n" RESET);
+			printf("min1 : %c|%d\n", minNodes.min1->S, minNodes.min1->F);
+			printf("\t");
+			printNode(minNodes.min1->up);
+			printf("\t");
+			printNode(minNodes.min1->down);
+			printf("min2 : %c|%d\n", minNodes.min2->S, minNodes.min2->F);
+			printf("\t");
+			printNode(minNodes.min2->up);
+			printf("\t");
+			printNode(minNodes.min2->down);
+		}
 
 		// Give to mins a binary value (part of their code)
 		// Malloc the code because we don't already know the future code's lenght of each node
@@ -112,21 +132,67 @@ void buildCodeHuffman(int *frequencies, char **HuffmanDico)
 
 		// Create the new node from the 2 min nodes. We don't care about the symbol given
 		node_t *nNode = consNode('\0', minNodes.min1->F + minNodes.min2->F);
+
 		// Save the new node node as father of min nodes
 		nNode->down = minNodes.min1;
 		nNode->up = minNodes.min2;
+		nNode->lvl = fmax((int)nNode->down->lvl, (int)nNode->up->lvl) + 1;
 
-		// if (0)
+		if (0)
 		{
 			printf("New node is : ");
 			printNode(nNode);
 		}
 
 		// Remove the 2 mins of the list
-		lHead = removeMins(lHead, &minNodes, nNode);
+		// printf("going to remove mins\n");
+		lHead = removeMins(lHead, &minNodes);
+		// printf(YELLOW "Mins have been removed, new list is : \n" RESET);
+		// printList(lHead);
+
+		list_t *newElement = listConstruct(nNode);
+		// Save newElement as the head of the list
+
+		// printf("Before lHead is : ");
+		// printListElement(lHead);
+		newElement->suc = lHead;
+		lHead = newElement;
+
+		// printf("New lHead is : ");
+		// printListElement(lHead);
+		// sleep(5);
+		pred = NULL;
+		// Insert newElement in the list
+		while (newElement != NULL && newElement->suc != NULL)
+		{
+			// Swap if freq is lower than the next one
+			if (newElement->n->F > newElement->suc->n->F || (newElement->n->S == newElement->suc->n->S && newElement->n->F >= newElement->suc->n->F))
+			{
+				list_t *next = newElement->suc;
+
+				// link the pred with the suc of newElement
+				if (pred != NULL)
+					pred->suc = next;
+
+				// link newElement with the suc of his suc
+				newElement->suc = next->suc;
+
+				// link the suc of newElement to newElement
+				next->suc = newElement;
+
+				// If newElement is the head, change the new Head
+				if (newElement->n == lHead->n)
+					lHead = next;
+
+				// Update the new pred
+				pred = next;
+			}
+			else
+				break;
+		}
 
 		// Print all values of the list
-		// if (0)
+		if (0)
 		{
 			printf(YELLOW "\n\nPrint all values of the list : \n" RESET);
 			printList(lHead);
@@ -168,7 +234,6 @@ unsigned char *encodeHuffman(const char *str, char **HuffmanDico)
 	assert(binFile != NULL);
 
 	int lengthStr = strlen(str);
-	printf("lengthStr is %d\n", lengthStr);
 	for (int i = 0; i < lengthStr; i++)
 	{
 		// get the code of the current caracter of the string
@@ -190,8 +255,8 @@ unsigned char *encodeHuffman(const char *str, char **HuffmanDico)
 				// printf(YELLOW "toSend is %u\n" RESET, res[resSize]);
 				assert(fwrite(&res[resSize], usize, 1, binFile) == 1);
 
-				res = (unsigned char *)realloc(res, usize * (resSize + 1));
-				res[++resSize] = 0;
+				res = (unsigned char *)realloc(res, usize * (++resSize + 1));
+				res[resSize] = 0;
 
 				count = 0;
 			}
@@ -201,7 +266,7 @@ unsigned char *encodeHuffman(const char *str, char **HuffmanDico)
 	if (count != 0)
 	{
 		// We want that the bits are high ordered and non low ordered
-		for (int i = 0; i < count; i++)
+		for (int i = 0; i < 8 - count; i++)
 			res[resSize] <<= 1;
 
 		assert(fwrite(&res[resSize], usize, 1, binFile) == 1);
@@ -210,8 +275,8 @@ unsigned char *encodeHuffman(const char *str, char **HuffmanDico)
 	assert(fclose(binFile) == 0);
 
 	// add \0 at the end
-	res = (unsigned char *)realloc(res, usize * (resSize + 1));
-	res[++resSize] = 0;
+	res = (unsigned char *)realloc(res, usize * (++resSize + 1));
+	res[resSize] = 0;
 
 	return res;
 }
@@ -236,6 +301,7 @@ char *decodeHuffman(unsigned char *str, char **HuffmanDico)
 
 	unsigned char buffer = 0;
 	int usize = sizeof(unsigned char);
+	int csize = sizeof(char);
 	while (fread(&buffer, usize, 1, binFile) == 1)
 	{
 		// printf(YELLOW "\nbuffer is %d\n" RESET, buffer);
@@ -281,18 +347,17 @@ char *decodeHuffman(unsigned char *str, char **HuffmanDico)
 					// printf("candidatIdx is %d(%c)\n", candidatIdx, candidatIdx);
 					if (res == NULL)
 					{
-						res = (char *)malloc(sizeof(char) * 2);
+						res = (char *)malloc(csize);
 						globalCounter++;
 						res[resSize++] = (char)candidatIdx;
-						res[resSize++] = '\0';
 					}
 					else
 					{
-						res = realloc(res, (resSize + 1) * sizeof(char));
-						res[resSize - 1] = (char)candidatIdx;
-						res[resSize++] = '\0';
+						res = realloc(res, csize * (resSize + 1));
+						res[resSize++] = (char)candidatIdx;
 					}
 
+					// reset all values necessary
 					for (int z = 0; z < 128; z++)
 						candidatList[z] = 1;
 					nbCandidat = 128;
@@ -307,6 +372,9 @@ char *decodeHuffman(unsigned char *str, char **HuffmanDico)
 	}
 
 	assert(fclose(binFile) == 0);
+
+	res = realloc(res, csize * (resSize + 1));
+	res[resSize] = '\0';
 
 	return res;
 }

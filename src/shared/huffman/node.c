@@ -1,5 +1,6 @@
 #include "node.h"
 #include "TA.h"
+#include <string.h>
 
 #include "count.h"
 
@@ -18,11 +19,13 @@ node_t *consNode(symbol_t Sy, frequence_t Freq)
 
 char *toStringNode(node_t *N)
 {
-    if (N == NULL)
-        return "Noeud (NULL)";
-    char *buffer = (char *)malloc(sizeof(char) * 100);
+    char *buffer = (char *)malloc(sizeof(char) * 200);
     globalCounter++;
-    sprintf(buffer, "Noeud [Symbole : %d(%c) | Frequence : %d | Code : %s]", N->S, (N->S == '\0' ? ' ' : N->S), N->F, N->code);
+
+    if (N == NULL)
+        sprintf(buffer, "Noeud (NULL)");
+    else
+        sprintf(buffer, "Noeud [Symbole : %d(%c) | Frequence : %d | Code : %s | Level : %d]", N->S, (N->S == '\0' ? ' ' : N->S), N->F, N->code, N->lvl);
     return buffer;
 }
 
@@ -30,6 +33,7 @@ void printNode(node_t *N)
 {
     char *str = toStringNode(N);
     printf("%s\n", str);
+
     free(str);
     str = NULL;
     globalCounter--;
