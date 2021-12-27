@@ -3,12 +3,14 @@
 #include <string.h>
 #include "rle.h"
 #include "../buffer.h"
+#include "../huffman/count.h"
 
 void encodeRLE(char *S, int len, char **res, int *resLen)
 {
     int shift = 0;
 
-    *res = malloc(len * sizeof(char));
+    *res = malloc((len + 1) * sizeof(char));
+    globalCounter++;
 
     char numberString[10];
     int thisCharCount = 0;
@@ -25,6 +27,7 @@ void encodeRLE(char *S, int len, char **res, int *resLen)
                 (*res)[j] = S[j];
                 *resLen = len;
             }
+            (*res)[len] = '\0';
             return;
         }
 
@@ -73,7 +76,7 @@ void encodeRLE(char *S, int len, char **res, int *resLen)
     *resLen = shift;
     // Realloc res to the exact size of the result if needed
     if (shift != len)
-        *res = realloc(*res, shift * sizeof(char));
+        *res = realloc(*res, (shift + 1) * sizeof(char));
 }
 
 void decodeRLE(char *S, int len, char **res, int *resLen)
@@ -82,7 +85,8 @@ void decodeRLE(char *S, int len, char **res, int *resLen)
     // Size can only be bigger than len
     int size = len;
 
-    *res = malloc(size * sizeof(char));
+    *res = malloc((size + 1) * sizeof(char));
+    globalCounter++;
 
     // For every char of S
     for (int i = 0; i < len; i++)
@@ -95,7 +99,7 @@ void decodeRLE(char *S, int len, char **res, int *resLen)
             if (size > BUFFERSIZE)
                 size = len;
             // Realloc res to new size
-            *res = realloc(*res, size * sizeof(char));
+            *res = realloc(*res, (size + 1) * sizeof(char));
         }
 
         // RLE
@@ -155,7 +159,7 @@ void decodeRLE(char *S, int len, char **res, int *resLen)
     *resLen = shift;
     // Realloc res to the exact size of the result
     if (shift != len)
-        *res = realloc(*res, shift * sizeof(char));
+        *res = realloc(*res, (shift + 1) * sizeof(char));
 }
 
 // int main(int argc, char const *argv[])
