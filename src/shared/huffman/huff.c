@@ -122,11 +122,11 @@ void buildCodeHuffman(int *frequencies, char **HuffmanDico)
 
 		// Give to mins a binary value (part of their code)
 		// Malloc the code because we don't already know the future code's lenght of each node
-		minNodes.min1->code = (char *)malloc(sizeof(char));
+		minNodes.min1->code = (char *)malloc(sizeof(char) * 2);
 		globalCounter++;
 		sprintf(minNodes.min1->code, "0");
 
-		minNodes.min2->code = (char *)malloc(sizeof(char));
+		minNodes.min2->code = (char *)malloc(sizeof(char) * 2);
 		globalCounter++;
 		sprintf(minNodes.min2->code, "1");
 
@@ -208,7 +208,7 @@ void buildCodeHuffman(int *frequencies, char **HuffmanDico)
 	}
 
 	// CONSTRUCT THE CODE FOR EACH NODE
-	lHead->n->code = "";
+	lHead->n->code = "\0";
 
 	getCode(lHead->n, HuffmanDico);
 
@@ -220,7 +220,7 @@ void buildCodeHuffman(int *frequencies, char **HuffmanDico)
 	globalCounter--;
 }
 
-unsigned char *encodeHuffman(const char *str, char **HuffmanDico)
+unsigned char *encodeHuffman(const char *str, int lgthStr, char **HuffmanDico, int *encodedLgth)
 {
 	const int usize = sizeof(unsigned char);
 	int resSize = 0;
@@ -233,8 +233,7 @@ unsigned char *encodeHuffman(const char *str, char **HuffmanDico)
 	FILE *binFile = fopen("res/huffmanEncoded.bin", "wb");
 	assert(binFile != NULL);
 
-	int lengthStr = strlen(str);
-	for (int i = 0; i < lengthStr; i++)
+	for (int i = 0; i < lgthStr; i++)
 	{
 		// get the code of the current caracter of the string
 		char *code = HuffmanDico[(int)str[i]];
@@ -254,7 +253,6 @@ unsigned char *encodeHuffman(const char *str, char **HuffmanDico)
 			{
 				// printf(YELLOW "toSend is %u\n" RESET, res[resSize]);
 				assert(fwrite(&res[resSize], usize, 1, binFile) == 1);
-
 				res = (unsigned char *)realloc(res, usize * (++resSize + 1));
 				res[resSize] = 0;
 
@@ -278,10 +276,12 @@ unsigned char *encodeHuffman(const char *str, char **HuffmanDico)
 	res = (unsigned char *)realloc(res, usize * (++resSize + 1));
 	res[resSize] = 0;
 
+	*encodedLgth = resSize;
+
 	return res;
 }
 
-char *decodeHuffman(unsigned char *str, char **HuffmanDico)
+char *decodeHuffman(unsigned char *str, int lgthStr, char **HuffmanDico, int *decodedLgth)
 {
 	FILE *binFile = fopen("res/huffmanEncoded.bin", "rb");
 
@@ -303,9 +303,8 @@ char *decodeHuffman(unsigned char *str, char **HuffmanDico)
 	if (binFile == NULL)
 	{
 		int path = 0;
-		int pathSize = strlen((char *)str);
 
-		while (path < pathSize)
+		while (path < lgthStr)
 		{
 			buffer = str[path];
 
@@ -455,6 +454,8 @@ char *decodeHuffman(unsigned char *str, char **HuffmanDico)
 
 	res = realloc(res, csize * (resSize + 1));
 	res[resSize] = '\0';
+
+	*decodedLgth = resSize;
 
 	return res;
 }
