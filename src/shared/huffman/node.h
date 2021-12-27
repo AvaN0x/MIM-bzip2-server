@@ -10,6 +10,7 @@ typedef struct elem_node_t
 	symbol_t S;
 	frequence_t F;
 	char *code;
+	int lvl;
 	struct elem_node_t *down, *up;
 } node_t;
 
