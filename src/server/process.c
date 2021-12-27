@@ -12,15 +12,21 @@
 #include "../shared/m2f/m2f.h"
 #include "../shared/rle/rle.h"
 
+#include "../shared/huffman/count.h"
+
 void processFile(char *fileName)
 {
     char *tmpFileName = (char *)malloc(sizeof(char) * (strlen(fileName) + 4));
+    globalCounter++;
+
     strcpy(tmpFileName, "res/");
     strcat(tmpFileName, fileName);
 
     printf("tmpFileName: " FONT_MAGENTA "%s\n" FONT_DEFAULT, tmpFileName);
     FILE *file = fopen(tmpFileName, "r");
     free(tmpFileName);
+    tmpFileName = NULL;
+    globalCounter--;
 
     if (!file)
     {
@@ -83,7 +89,12 @@ void processBuffer(char *buffer, int size)
     printf(FONT_YELLOW "ENCODE M2F\n" FONT_DEFAULT);
     printf("\"");
     for (int i = 0; i < size; i++)
-        printf("%c", shifts[i]);
+    {
+        if (shifts[i] == 0)
+            printf("\\0");
+        else
+            printf("%c", shifts[i]);
+    }
     printf("\"\n");
 
     printf(FONT_YELLOW "ENCODE RLE\n" FONT_DEFAULT);
@@ -95,25 +106,64 @@ void processBuffer(char *buffer, int size)
 
     printf("(%d) \"", rle_len);
     for (int i = 0; i < rle_len; i++)
-        printf("%c", S_rle[i]);
+    {
+        if (S_rle[i] == 0)
+            printf("\\0");
+        else
+            printf("%c", S_rle[i]);
+    }
     printf("\"\n");
 
-    // |
-    // |
-    // |
+    printf(FONT_YELLOW "ENCODE HUFFMAN\n" FONT_DEFAULT);
+    int dico[128] = {};
+    char *HuffmanDico[128] = {};
+    for (int i = 0; i < rle_len; i++)
+        dico[(int)S_rle[i]]++;
+
+    buildCodeHuffman(dico, HuffmanDico);
+    // printf("GLOBAL COUNT IS %d\n", globalCounter);
+
+    unsigned char *encodedHuffman;
+    int encodedHuffmanSize;
+    encodedHuffman = encodeHuffman(S_rle, rle_len, HuffmanDico, &encodedHuffmanSize);
+
+    printf("(%d) \"", encodedHuffmanSize);
+    for (int i = 0; i < encodedHuffmanSize; i++)
+        printf("%u ", encodedHuffman[i]);
+    printf("\"\n");
+
     printf("\n\n");
-    // |
-    // |
-    // |
-    // |
+
+    printf(FONT_YELLOW "DECODE HUFFMAN\n" FONT_DEFAULT);
+    char *decodedHuffman;
+    int decodedHuffmanSize;
+    decodedHuffman = decodeHuffman(encodedHuffman, encodedHuffmanSize, HuffmanDico, &decodedHuffmanSize);
+
+    printf("(%d) \"", decodedHuffmanSize);
+    for (int i = 0; i < decodedHuffmanSize; i++)
+    {
+        if (decodedHuffman[i] == 0)
+            printf("\\0");
+        else
+            printf("%c", decodedHuffman[i]);
+    }
+    printf("\"\n");
 
     printf(FONT_YELLOW "DECODE RLE\n" FONT_DEFAULT);
 
     char *S_decoded_rle;
     int rle_decoded_len;
 
-    decodeRLE(S_rle, rle_len, &S_decoded_rle, &rle_decoded_len);
-    printf("(%d) \"%s\"\n", rle_decoded_len, S_decoded_rle);
+    decodeRLE(decodedHuffman, decodedHuffmanSize, &S_decoded_rle, &rle_decoded_len);
+    printf("(%d) \"", rle_decoded_len);
+    for (int i = 0; i < rle_decoded_len; i++)
+    {
+        if (S_decoded_rle[i] == 0)
+            printf("\\0");
+        else
+            printf("%c", S_decoded_rle[i]);
+    }
+    printf("\"\n");
 
     printf(FONT_YELLOW "DECODE M2F\n" FONT_DEFAULT);
     char Sdecoded[rle_decoded_len];
@@ -126,4 +176,30 @@ void processBuffer(char *buffer, int size)
     char bwtSdecoded[rle_decoded_len + 1];
     decodeBWT(Sdecoded, rle_decoded_len, idx, bwtSdecoded);
     printf("\"%s\"\n", bwtSdecoded);
+
+    free(encodedHuffman);
+    encodedHuffman = NULL;
+    globalCounter--;
+
+    free(decodedHuffman);
+    decodedHuffman = NULL;
+    globalCounter--;
+
+    free(S_rle);
+    S_rle = NULL;
+    globalCounter--;
+
+    free(S_decoded_rle);
+    S_decoded_rle = NULL;
+    globalCounter--;
+
+    for (int i = 0; i < 128; i++)
+        if (HuffmanDico[i] != NULL)
+        {
+            free(HuffmanDico[i]);
+            HuffmanDico[i] = NULL;
+            globalCounter--;
+        }
+
+    // printf("GLOBAL COUNT IS %d\n", globalCounter);
 }
