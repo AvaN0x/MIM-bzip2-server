@@ -284,8 +284,6 @@ unsigned char *encodeHuffman(const char *str, char **HuffmanDico)
 char *decodeHuffman(unsigned char *str, char **HuffmanDico)
 {
 	FILE *binFile = fopen("res/huffmanEncoded.bin", "rb");
-	// TODO USE PARAMETER STR
-	assert(binFile != NULL);
 
 	char *res = NULL;
 	int resSize = 0;
@@ -300,78 +298,160 @@ char *decodeHuffman(unsigned char *str, char **HuffmanDico)
 	int cursor = -1;
 
 	unsigned char buffer = 0;
-	int usize = sizeof(unsigned char);
 	int csize = sizeof(char);
-	while (fread(&buffer, usize, 1, binFile) == 1)
+
+	if (binFile == NULL)
 	{
-		// printf(YELLOW "\nbuffer is %d\n" RESET, buffer);
-		for (int i = 7; i >= 0; i--)
+		int path = 0;
+		int pathSize = strlen((char *)str);
+
+		while (path < pathSize)
 		{
-			// printf(YELLOW "I = %d\n" RESET, i);
-			unsigned char mask = (unsigned char)pow(2.0, (double)i);
-			// printf("Mask is %d\n", mask);
-			unsigned char codeBit = (buffer & mask) >> i;
-			// printf("codeBit is %d\n", codeBit);
-			cursor++;
-			// printf(YELLOW "cursor is %d\n" RESET, cursor);
+			buffer = str[path];
 
-			for (int j = 0; j < 128; j++)
+			// printf(YELLOW "\nbuffer is %d\n" RESET, buffer);
+			for (int i = 7; i >= 0; i--)
 			{
-				// If char has a code
-				if (HuffmanDico[j] != NULL)
-				{
-					// If char is candidate and his code is correct
-					if (candidatList[j] == 1 && (HuffmanDico[j][cursor] - '0') != codeBit)
-					{
-						candidatList[j] = 0;
-						nbCandidat--;
-						candidatIdx -= j;
-					}
-				}
-				else
-				{
-					if (candidatList[j])
-					{
-						candidatList[j] = 0;
-						nbCandidat--;
-						candidatIdx -= j;
-					}
-				}
+				// printf(YELLOW "I = %d\n" RESET, i);
+				unsigned char mask = (unsigned char)pow(2.0, (double)i);
+				// printf("Mask is %d\n", mask);
+				unsigned char codeBit = (buffer & mask) >> i;
+				// printf("codeBit is %d\n", codeBit);
+				cursor++;
+				// printf(YELLOW "cursor is %d\n" RESET, cursor);
 
-				// debug
-				// if (candidatList[j] == 1)
-				// 	printf("%d|%c\n", j, j);
-
-				if (nbCandidat == 1)
+				for (int j = 0; j < 128; j++)
 				{
-					// printf("candidatIdx is %d(%c)\n", candidatIdx, candidatIdx);
-					if (res == NULL)
+					// If char has a code
+					if (HuffmanDico[j] != NULL)
 					{
-						res = (char *)malloc(csize);
-						globalCounter++;
-						res[resSize++] = (char)candidatIdx;
+						// If char is candidate and his code is correct
+						if (candidatList[j] == 1 && (HuffmanDico[j][cursor] - '0') != codeBit)
+						{
+							candidatList[j] = 0;
+							nbCandidat--;
+							candidatIdx -= j;
+						}
 					}
 					else
 					{
-						res = realloc(res, csize * (resSize + 1));
-						res[resSize++] = (char)candidatIdx;
+						if (candidatList[j])
+						{
+							candidatList[j] = 0;
+							nbCandidat--;
+							candidatIdx -= j;
+						}
 					}
 
-					// reset all values necessary
-					for (int z = 0; z < 128; z++)
-						candidatList[z] = 1;
-					nbCandidat = 128;
-					candidatIdx = 8128;
-					cursor = -1;
+					// debug
+					// if (candidatList[j] == 1)
+					// 	printf("%d|%c\n", j, j);
 
-					// printf(YELLOW "res is now : %s\n" RESET, res);
-					break;
+					if (nbCandidat == 1)
+					{
+						// printf("candidatIdx is %d(%c)\n", candidatIdx, candidatIdx);
+						if (res == NULL)
+						{
+							res = (char *)malloc(csize);
+							globalCounter++;
+							res[resSize++] = (char)candidatIdx;
+						}
+						else
+						{
+							res = realloc(res, csize * (resSize + 1));
+							res[resSize++] = (char)candidatIdx;
+						}
+
+						// reset all values necessary
+						for (int z = 0; z < 128; z++)
+							candidatList[z] = 1;
+						nbCandidat = 128;
+						candidatIdx = 8128;
+						cursor = -1;
+
+						// printf(YELLOW "res is now : %s\n" RESET, res);
+						break;
+					}
+				}
+			}
+
+			path++;
+		}
+	}
+	else
+	{
+		int usize = sizeof(unsigned char);
+		while (fread(&buffer, usize, 1, binFile) == 1)
+		{
+			// printf(YELLOW "\nbuffer is %d\n" RESET, buffer);
+			for (int i = 7; i >= 0; i--)
+			{
+				// printf(YELLOW "I = %d\n" RESET, i);
+				unsigned char mask = (unsigned char)pow(2.0, (double)i);
+				// printf("Mask is %d\n", mask);
+				unsigned char codeBit = (buffer & mask) >> i;
+				// printf("codeBit is %d\n", codeBit);
+				cursor++;
+				// printf(YELLOW "cursor is %d\n" RESET, cursor);
+
+				for (int j = 0; j < 128; j++)
+				{
+					// If char has a code
+					if (HuffmanDico[j] != NULL)
+					{
+						// If char is candidate and his code is correct
+						if (candidatList[j] == 1 && (HuffmanDico[j][cursor] - '0') != codeBit)
+						{
+							candidatList[j] = 0;
+							nbCandidat--;
+							candidatIdx -= j;
+						}
+					}
+					else
+					{
+						if (candidatList[j])
+						{
+							candidatList[j] = 0;
+							nbCandidat--;
+							candidatIdx -= j;
+						}
+					}
+
+					// debug
+					// if (candidatList[j] == 1)
+					// 	printf("%d|%c\n", j, j);
+
+					if (nbCandidat == 1)
+					{
+						// printf("candidatIdx is %d(%c)\n", candidatIdx, candidatIdx);
+						if (res == NULL)
+						{
+							res = (char *)malloc(csize);
+							globalCounter++;
+							res[resSize++] = (char)candidatIdx;
+						}
+						else
+						{
+							res = realloc(res, csize * (resSize + 1));
+							res[resSize++] = (char)candidatIdx;
+						}
+
+						// reset all values necessary
+						for (int z = 0; z < 128; z++)
+							candidatList[z] = 1;
+						nbCandidat = 128;
+						candidatIdx = 8128;
+						cursor = -1;
+
+						// printf(YELLOW "res is now : %s\n" RESET, res);
+						break;
+					}
 				}
 			}
 		}
-	}
 
-	assert(fclose(binFile) == 0);
+		assert(fclose(binFile) == 0);
+	}
 
 	res = realloc(res, csize * (resSize + 1));
 	res[resSize] = '\0';
