@@ -1,6 +1,6 @@
 #ifndef DEF_BUFFER
 #define DEF_BUFFER
 
-#define BUFFERSIZE 512
+#define BUFFER_SIZE 1024
 
 #endif

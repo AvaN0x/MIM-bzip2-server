@@ -90,9 +90,9 @@ void decodeRLE(char *S, int len, char **res, int *resLen)
         // Resize res if needed
         if (shift > size)
         {
-            // Will add 32 to the actual size, and if new size is above BUFFERSIZE, then we set it to BUFFERSIZE
+            // Will add 32 to the actual size, and if new size is above BUFFER_SIZE, then we set it to BUFFER_SIZE
             size = size + 32;
-            if (size > BUFFERSIZE)
+            if (size > BUFFER_SIZE)
                 size = len;
             // Realloc res to new size
             *res = realloc(*res, size * sizeof(char));

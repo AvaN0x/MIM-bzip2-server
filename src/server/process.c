@@ -30,7 +30,7 @@ void processFile(char *fileName)
 
     printf("File content :\n");
     {
-        char buffer[BUFFERSIZE];
+        char buffer[BUFFER_SIZE];
         int count = 0;
         char c;
         while ((c = fgetc(file)) != EOF)
@@ -41,7 +41,7 @@ void processFile(char *fileName)
 
             buffer[count++] = c; // Use actual count value and increment it after
 
-            if (count > (BUFFERSIZE - 2))
+            if (count > (BUFFER_SIZE - 2))
             {
                 buffer[count] = '\0';
                 processBuffer(buffer, count);
@@ -63,7 +63,7 @@ void processFile(char *fileName)
 void processBuffer(char *buffer, int size)
 {
     // int size = strlen(buffer);
-    // Max value of size is BUFFERSIZE - 1
+    // Max value of size is BUFFER_SIZE - 1
     char S[size + 1];
     strcpy(S, buffer);
     printf(FONT_YELLOW "%d: \"" FONT_DEFAULT "%s" FONT_YELLOW "\"\n\n" FONT_DEFAULT, size, S);
