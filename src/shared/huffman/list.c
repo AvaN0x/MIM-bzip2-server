@@ -274,23 +274,23 @@ void getCode(node_t *node, char **huffmanDico)
     int lengthCode = strlen(node->code);
     if (node->up != NULL)
     {
-        node->up->code = (char *)realloc(node->up->code, 1 + sizeof(char) * lengthCode);
+        node->up->code = (char *)realloc(node->up->code, sizeof(char) * (lengthCode + 1 + 1));
         node->up->code = strcat(node->up->code, node->code);
         getCode(node->up, huffmanDico);
     }
     if (node->down != NULL)
     {
-        node->down->code = (char *)realloc(node->down->code, 1 + sizeof(char) * lengthCode);
+        node->down->code = (char *)realloc(node->down->code, sizeof(char) * (lengthCode + 1 + 1));
         node->down->code = strcat(node->down->code, node->code);
         getCode(node->down, huffmanDico);
     }
 
     if (node->down == NULL && node->up == NULL)
     {
-        huffmanDico[node->S] = (char *)malloc(sizeof(char) * lengthCode);
+        huffmanDico[node->S] = (char *)malloc(sizeof(char) * (lengthCode + 1));
         globalCounter++;
-        char *reversedCode = reverseCode(node->code);
-        strncpy(huffmanDico[node->S], reversedCode, lengthCode);
+        reverseCode(node->code);
+        strcpy(huffmanDico[node->S], node->code);
     }
 }
 
