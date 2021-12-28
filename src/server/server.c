@@ -31,12 +31,12 @@
  */
 int main(int argc, char const *argv[])
 {
-    if (0)
+    // if (0)
     {
         // if (0)
         {
-            processFile("lorem_ipsum.txt");
-            // processFile("mississippi.txt");
+            processFile("res/lorem_ipsum.txt");
+            // processFile("res/mississippi.txt");
         }
         //----------------------//
         // Read content of file //

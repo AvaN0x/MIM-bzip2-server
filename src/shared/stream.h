@@ -7,7 +7,8 @@
 
 #define PORT 6000
 
-#define STREAM_SIZE BUFFER_SIZE + 128
+// #define STREAM_SIZE BUFFER_SIZE + 128
+#define STREAM_SIZE 1024 + 128
 
 typedef struct
 {

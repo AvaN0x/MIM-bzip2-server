@@ -14,19 +14,14 @@
 
 #include "../shared/huffman/count.h"
 
-void processFile(char *fileName)
+/**
+ * Open a file, split the content into chunks of maximum size BUFFER_SIZE, and send them to processBuffer
+ *
+ * @param filePath
+ */
+void processFile(char *filePath)
 {
-    char *tmpFileName = (char *)malloc(sizeof(char) * (strlen(fileName) + 4));
-    globalCounter++;
-
-    strcpy(tmpFileName, "res/");
-    strcat(tmpFileName, fileName);
-
-    printf("tmpFileName: " FONT_MAGENTA "%s\n" FONT_DEFAULT, tmpFileName);
-    FILE *file = fopen(tmpFileName, "r");
-    free(tmpFileName);
-    tmpFileName = NULL;
-    globalCounter--;
+    FILE *file = fopen(filePath, "r");
 
     if (!file)
     {
