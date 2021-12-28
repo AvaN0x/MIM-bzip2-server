@@ -78,9 +78,10 @@ void destroy_stream(stream_t *s)
  * Serialize a stream into a buffer
  * @param s the stream
  * @param buffer the buffer to fill in
+ * @param size size of the buffer, 0 to let the function compute it
  * @return the size of the buffer
  */
-size_t serialize_stream(stream_t *s, void *buffer)
+size_t serialize_stream(stream_t *s, void *buffer, size_t size)
 {
     *((uint8_t *)buffer) = s->type;
     buffer += sizeof(uint8_t); // move in the buffer of the size of the type
@@ -102,10 +103,10 @@ size_t serialize_stream(stream_t *s, void *buffer)
     // if content is a string
     case STRING_CONTENT:
     case SEND_FILE_NAME:
-        len = strlen((char *)s->content); // get the length of the string
-        *((uint64_t *)buffer) = len;      // add the length to the buffer as int64_t
-        buffer += sizeof(uint64_t);       // move in the buffer
-        memcpy(buffer, s->content, len);  // copy the string
+        len = size > 0 ? size : strlen((char *)s->content); // get the length of the string
+        *((uint64_t *)buffer) = len;                        // add the length to the buffer as int64_t
+        buffer += sizeof(uint64_t);                         // move in the buffer
+        memcpy(buffer, s->content, len);                    // copy the string
         return sizeof(uint8_t) + sizeof(uint64_t) + len;
 
     default:

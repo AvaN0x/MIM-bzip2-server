@@ -373,7 +373,7 @@ void clientConnected(int communicationID)
             {
                 free(tmpFileName);
                 init_stream(&stream, FILE_DO_NOT_EXIST); // tell the client that the file do not exist
-                serStreamSize = serialize_stream(&stream, serStream);
+                serStreamSize = serialize_stream(&stream, serStream, 0);
                 send(communicationID, serStream, serStreamSize, 0); // send buffer to client
                 break;
             }
@@ -381,7 +381,7 @@ void clientConnected(int communicationID)
 
             // FIXME that's temporary
             init_stream(&stream, NULL_CONTENT);
-            serStreamSize = serialize_stream(&stream, serStream);
+            serStreamSize = serialize_stream(&stream, serStream, 0);
             send(communicationID, serStream, serStreamSize, 0); // send buffer to client
 
             free(tmpFileName);

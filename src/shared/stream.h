@@ -33,7 +33,7 @@ void init_stream(stream_t *, uint8_t);
 void set_content(stream_t *, void *);
 void destroy_stream(stream_t *);
 
-size_t serialize_stream(stream_t *, void *);
+size_t serialize_stream(stream_t *, void *, size_t);
 void unserialize_stream(void *, stream_t *);
 
 #endif

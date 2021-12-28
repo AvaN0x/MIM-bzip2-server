@@ -73,7 +73,7 @@ void connectedToServer(int fdSocket)
         case 0:
             loop = 0;                             // set the loop at false, will disconnect the client
             init_stream(&stream, END_CONNECTION); // tell the server that this client left
-            serStreamSize = serialize_stream(&stream, serStream);
+            serStreamSize = serialize_stream(&stream, serStream, 0);
             send(fdSocket, serStream, serStreamSize, 0); // send buffer to server
             break;
         case 1:
@@ -109,7 +109,7 @@ void askForFile(int fdSocket, stream_t *stream, char *bufferString, char *serStr
 
         init_stream(stream, SEND_FILE_NAME); // send file name to server
         set_content(stream, bufferString);
-        serStreamSize = serialize_stream(stream, serStream);
+        serStreamSize = serialize_stream(stream, serStream, 0);
         send(fdSocket, serStream, serStreamSize, 0); // send buffer to server
 
         bufSize = recv(fdSocket, serStream, STREAM_SIZE, 0);
