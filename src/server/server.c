@@ -31,7 +31,7 @@
  */
 int main(int argc, char const *argv[])
 {
-    // if (0)
+    if (0)
     {
         // if (0)
         {
@@ -379,7 +379,9 @@ void clientConnected(int communicationID)
             }
             printf("%d | Client requested existing file \"%s\" !\n", communicationID, tmpFileName);
 
-            // FIXME that's temporary
+            processFileForClient(tmpFileName, communicationID, &stream, serStream);
+
+            // NULL_CONTENT means that the file sending is finished
             init_stream(&stream, NULL_CONTENT);
             serStreamSize = serialize_stream(&stream, serStream, 0);
             send(communicationID, serStream, serStreamSize, 0); // send buffer to client

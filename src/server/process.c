@@ -2,6 +2,11 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <stddef.h>
 
 #include "../shared/buffer.h"
 #include "process.h"
@@ -15,7 +20,7 @@
 #include "../shared/huffman/count.h"
 
 /**
- * Open a file, split the content into chunks of maximum size BUFFER_SIZE, and send them to processBuffer
+ * Open a file, split the content into chunks of maximum size BUFFER_SIZE, and send them to encodeDecodeBufferBZIP2
  *
  * @param filePath
  */
@@ -45,14 +50,14 @@ void processFile(char *filePath)
             if (count > (BUFFER_SIZE - 2))
             {
                 buffer[count] = '\0';
-                processBuffer(buffer, count);
+                encodeDecodeBufferBZIP2(buffer, count);
                 count = 0;
             }
         }
         if (count > 0)
         {
             buffer[count] = '\0';
-            processBuffer(buffer, count);
+            encodeDecodeBufferBZIP2(buffer, count);
             count = 0;
         }
         printf("\n");
@@ -61,7 +66,7 @@ void processFile(char *filePath)
     fclose(file);
 }
 
-void processBuffer(char *buffer, int size)
+void encodeDecodeBufferBZIP2(char *buffer, int size)
 {
     // int size = strlen(buffer);
     // Max value of size is BUFFER_SIZE - 1
@@ -197,4 +202,74 @@ void processBuffer(char *buffer, int size)
         }
 
     // printf("GLOBAL COUNT IS %d\n", globalCounter);
+}
+
+// TODO I kept the other functions above while we are not done, but I think we will delete them
+/**
+ * Open a file, split the content into chunks of maximum size BUFFER_SIZE, and send them to encodeBufferAndSendToClient
+ *
+ * @param filePath
+ * @param communicationID socket
+ * @param stream
+ * @param serStream buffer used to send data to the client
+ */
+void processFileForClient(char *filePath, int communicationID, stream_t *stream, char *serStream)
+{
+    FILE *file = fopen(filePath, "r");
+
+    if (!file)
+    {
+        fprintf(stderr, "File not found\n");
+        return;
+    }
+
+    printf("File content :\n");
+    {
+        char buffer[BUFFER_SIZE];
+        int count = 0;
+        char c;
+        while ((c = fgetc(file)) != EOF)
+        {
+            // Only allow ascii chars
+            if (c < 0 || c > 127)
+                continue;
+
+            buffer[count++] = c; // Use actual count value and increment it after
+
+            if (count > (BUFFER_SIZE - 2))
+            {
+                buffer[count] = '\0';
+                encodeBufferForClient(buffer, count, communicationID, stream, serStream);
+                count = 0;
+            }
+        }
+        if (count > 0)
+        {
+            buffer[count] = '\0';
+            encodeBufferForClient(buffer, count, communicationID, stream, serStream);
+            count = 0;
+        }
+        printf("\n");
+    }
+
+    fclose(file);
+}
+
+/**
+ * Encode the buffer and send it to the client
+ *
+ * @param buffer original string
+ * @param size size of the buffer
+ * @param communicationID socket
+ * @param stream
+ * @param serStream buffer used to send data to the client
+ */
+void encodeBufferForClient(char *buffer, int size, int communicationID, stream_t *stream, char *serStream)
+{
+    size_t serStreamSize;
+
+    // Max value of size is BUFFER_SIZE - 1
+    char S[size + 1];
+    strcpy(S, buffer);
+    printf(FONT_YELLOW "%d: \"" FONT_DEFAULT "%s" FONT_YELLOW "\"\n\n" FONT_DEFAULT, size, S);
 }
