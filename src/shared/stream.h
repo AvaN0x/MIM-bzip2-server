@@ -29,7 +29,9 @@ enum
     STRING_CONTENT,
     SEND_FILE_NAME,
     // content : string of unsigned char
-    SEND_GZIP2_STRING
+    SEND_GZIP2_STRING,
+    // content : int[128]
+    SEND_CHAR_FREQUENCES,
 };
 
 stream_t create_stream();

@@ -176,10 +176,25 @@ void encodeBufferForClient(char *buffer, int size, int communicationID, stream_t
     set_content(stream, &idxBWT, 0);
     serStreamSize = serialize_stream(stream, serStream);
     send(communicationID, serStream, serStreamSize, 0); // send buffer to client
+    printf("serStreamSize: %zu\n", serStreamSize);
+
+    // for (int i = 0; i < 128; i++)
+    // {
+    //     if (charFrequences[i] > 0)
+    //         printf("char(%d) %c : %d\n ", i, i, charFrequences[i]);
+    // }
+
+    printf("Send char frequences\n");
+    init_stream(stream, SEND_CHAR_FREQUENCES);
+    set_content(stream, charFrequences, 128);
+    serStreamSize = serialize_stream(stream, serStream);
+    send(communicationID, serStream, serStreamSize, 0); // send buffer to client
+    printf("serStreamSize: %zu\n", serStreamSize);
 
     printf("Send huffman\n");
     init_stream(stream, SEND_GZIP2_STRING);
     set_content(stream, huffmanEncoded, huffmanEncodedSize);
     serStreamSize = serialize_stream(stream, serStream);
     send(communicationID, serStream, serStreamSize, 0); // send buffer to client
+    printf("serStreamSize: %zu\n", serStreamSize);
 }

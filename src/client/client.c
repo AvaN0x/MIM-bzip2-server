@@ -132,18 +132,31 @@ bool askForFile(int fdSocket, stream_t *stream, char *bufferString, char *serStr
         while (stream->type != NULL_CONTENT)
         {
             // printf("%s", stream->content);
-            int idx;
-            int charFrequences[128];
+            int idxBWT;
+            int *charFrequences;
             unsigned char *encodedBZIP2;
             uint64_t encodedBZIP2Size;
 
             // Get idx
             if (stream->type != INT_CONTENT)
                 return false;
-            idx = *(int *)stream->content;
-            printf("idx : %d\n", idx);
+            idxBWT = *(int *)stream->content;
+            printf("idx : %d\n", idxBWT);
 
             // Get charFrequences
+            bufSize = recv(fdSocket, serStream, STREAM_SIZE, 0);
+            if (bufSize < 1)
+                return false;
+            unserialize_stream(serStream, stream);
+            if (stream->type != SEND_CHAR_FREQUENCES)
+                return false;
+            charFrequences = (int *)stream->content;
+
+            for (int i = 0; i < 128; i++)
+            {
+                if (charFrequences[i] > 0)
+                    printf("char(%2d) %c : %d\n ", i, i, charFrequences[i]);
+            }
 
             // Get encodedBZIP2 and encodedBZIP2Size
             bufSize = recv(fdSocket, serStream, STREAM_SIZE, 0);
@@ -159,6 +172,16 @@ bool askForFile(int fdSocket, stream_t *stream, char *bufferString, char *serStr
             for (int i = 0; i < encodedBZIP2Size; i++)
                 printf("%u ", encodedBZIP2[i]);
             printf("\"\n");
+
+            printf("1\n");
+            // All data are received, decode the data
+            char *decodedString;
+            int decodedStringSize;
+            printf("2\n");
+            decodeBZIP2(encodedBZIP2, encodedBZIP2Size, idxBWT, charFrequences, &decodedString, &decodedStringSize);
+            printf("3\n");
+
+            printf(FONT_YELLOW "\"" FONT_DEFAULT "%s" FONT_YELLOW "\"\n\n" FONT_DEFAULT, decodedString);
 
             // Receive another time for next while iteration
             bufSize = recv(fdSocket, serStream, STREAM_SIZE, 0);

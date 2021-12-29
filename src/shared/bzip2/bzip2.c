@@ -11,7 +11,7 @@
 #include "../m2f/m2f.h"
 #include "../rle/rle.h"
 
-// #define DEBUG_BZIP2 1
+#define DEBUG_BZIP2 1
 
 int encodeBZIP2(char *string, int size, int charFrequences[128], unsigned char **out, int *outSize)
 {
@@ -80,6 +80,12 @@ int encodeBZIP2(char *string, int size, int charFrequences[128], unsigned char *
     char *HuffmanDico[128] = {};
     buildCodeHuffman(charFrequences, HuffmanDico);
 
+#ifdef DEBUG_BZIP2
+    for (int i = 0; i < 128; i++)
+        if (HuffmanDico[i] != NULL)
+            printf("%d|%c : %s\n", i, i, HuffmanDico[i]);
+#endif
+
     *out = encodeHuffman(S_rle, rle_len, HuffmanDico, outSize);
     // S_rle will not be used anymore
     free(S_rle);
@@ -104,6 +110,7 @@ int encodeBZIP2(char *string, int size, int charFrequences[128], unsigned char *
 
     return idx;
 }
+
 void decodeBZIP2(unsigned char *encodedHuffman, int encodedHuffmanSize, int idxBWT, int charFrequences[128], char **out, int *outSize)
 {
     // Build Huffman dictionary
@@ -111,6 +118,10 @@ void decodeBZIP2(unsigned char *encodedHuffman, int encodedHuffmanSize, int idxB
     buildCodeHuffman(charFrequences, HuffmanDico);
 
 #ifdef DEBUG_BZIP2
+    for (int i = 0; i < 128; i++)
+        if (HuffmanDico[i] != NULL)
+            printf("%d|%c : %s\n", i, i, HuffmanDico[i]);
+
     printf(FONT_YELLOW "DECODE HUFFMAN\n" FONT_DEFAULT);
 #endif
 

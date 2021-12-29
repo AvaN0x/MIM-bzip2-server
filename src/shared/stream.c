@@ -49,7 +49,6 @@ void set_content(stream_t *s, void *content, size_t size)
         s->content = malloc(sizeof(int8_t));
         s->contentSize = 1;
         memcpy(s->content, content, 1);
-        printf("int stream content %d\n", *(int *)s->content);
         break;
 
     // if content is a string
@@ -66,6 +65,24 @@ void set_content(stream_t *s, void *content, size_t size)
         s->content = malloc(s->contentSize * sizeof(unsigned char)); // allocate the memory for the string
         memcpy(s->content, content, s->contentSize);                 // copy content
         // ((char *)s->content)[len] = '\0';                 // set the last char as '\0' to end the string
+        break;
+
+    case SEND_CHAR_FREQUENCES:
+        s->contentSize = 128;
+        for (int i = 0; i < 128; i++)
+        {
+            if (((int *)content)[i] > 0)
+                printf("content(%2d) %c : %d\n ", i, i, ((int *)content)[i]);
+        }
+
+        s->content = malloc(128 * sizeof(int));         // allocate the memory for the array
+        memcpy(s->content, content, 128 * sizeof(int)); // copy content
+        for (int i = 0; i < 128; i++)
+        {
+            if (((int *)s->content)[i] > 0)
+                printf("scontent(%2d) %c : %d\n ", i, i, ((int *)s->content)[i]);
+        }
+
         break;
 
     case NULL_CONTENT:
@@ -129,6 +146,10 @@ size_t serialize_stream(stream_t *s, void *buffer)
         //     memcpy(buffer, s->content, size); // copy the string
         //     return sizeof(uint8_t) + sizeof(uint64_t) + size;
 
+    case SEND_CHAR_FREQUENCES:
+        memcpy(buffer, s->content, 128 * sizeof(int)); // copy the array
+        return sizeof(uint8_t) + sizeof(int) * 128;
+
     default:
         return 0;
     }
@@ -169,6 +190,23 @@ void unserialize_stream(void *buffer, stream_t *s)
         s->content = malloc((s->contentSize + 1) * sizeof(unsigned char)); // allocate the size of the string
         memcpy(s->content, buffer, s->contentSize);                        // copy content
         ((char *)s->content)[s->contentSize] = '\0';                       // set the last char as '\0' to end the string
+        break;
+
+    case SEND_CHAR_FREQUENCES:
+        s->contentSize = 128;
+        s->content = malloc(128 * sizeof(int)); // allocate the size of the array
+        for (int i = 0; i < 128; i++)
+        {
+            if (((int *)buffer)[i] > 0)
+                printf("content(%2d) %c : %d\n ", i, i, ((int *)buffer)[i]);
+        }
+        memcpy(s->content, buffer, 128 * sizeof(int)); // copy content of the array
+        for (int i = 0; i < 128; i++)
+        {
+            if (((int *)s->content)[i] > 0)
+                printf("scontent(%2d) %c : %d\n ", i, i, ((int *)s->content)[i]);
+        }
+
         break;
 
     case NULL_CONTENT:

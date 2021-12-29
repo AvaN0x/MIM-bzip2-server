@@ -27,8 +27,8 @@ objBZIP2:
 	@[ -d $(OBJ)/bzip2 ] || mkdir -p $(OBJ)/bzip2
 
 
-client:
-	$(CC) $(FLAGS) $(SRC)/shared/stream.c $(SRC)/client/client.c -o $(BIN)/client
+client: bwt m2f huffman bzip2
+	$(CC) $(FLAGS) -o  $(BIN)/client $(SRC)/shared/stream.c $(SRC)/client/client.c $(SRC)/shared/bwt/bwt.c $(SRC)/shared/m2f/m2f.c $(SRC)/shared/rle/rle.c $(SRC)/shared/huffman/node.c $(SRC)/shared/huffman/list.c $(SRC)/shared/huffman/huff.c $(SRC)/shared/huffman/count.c $(SRC)/shared/bzip2/bzip2.c -lm
 
 server: bwt m2f huffman bzip2
 	$(CC) $(FLAGS) -o $(BIN)/server $(SRC)/shared/stream.c $(SRC)/server/process.c $(SRC)/server/server.c $(SRC)/shared/bwt/bwt.c $(SRC)/shared/m2f/m2f.c $(SRC)/shared/rle/rle.c $(SRC)/shared/huffman/node.c $(SRC)/shared/huffman/list.c $(SRC)/shared/huffman/huff.c $(SRC)/shared/huffman/count.c $(SRC)/shared/bzip2/bzip2.c -lpthread -lm
