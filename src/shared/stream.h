@@ -22,6 +22,7 @@ enum
     // content : NULL
     NULL_CONTENT,
     END_CONNECTION,
+    FILE_EXIST,
     FILE_DO_NOT_EXIST,
     // content : int
     INT_CONTENT,

@@ -73,6 +73,7 @@ void set_content(stream_t *s, void *content, size_t size)
 
     case NULL_CONTENT:
     case END_CONNECTION:
+    case FILE_EXIST:
     case FILE_DO_NOT_EXIST:
     default:
         s->content = NULL;
@@ -107,12 +108,12 @@ size_t serialize_stream(stream_t *s, void *buffer)
     // if content is NULL
     case NULL_CONTENT:
     case END_CONNECTION:
+    case FILE_EXIST:
     case FILE_DO_NOT_EXIST:
         return sizeof(uint8_t);
 
     // if content is an int
     case INT_CONTENT:
-        printf("s->content (int) : %d\n", *((int32_t *)s->content));
         memcpy(buffer, s->content, sizeof(int32_t)); // copy the int
         return sizeof(uint8_t) + sizeof(int32_t);
 
@@ -179,6 +180,7 @@ void unserialize_stream(void *buffer, stream_t *s)
         break;
 
     case NULL_CONTENT:
+    case FILE_EXIST:
     case FILE_DO_NOT_EXIST:
     case END_CONNECTION:
     default:

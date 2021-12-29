@@ -146,19 +146,26 @@ void clientConnected(int communicationID)
             strcpy(tmpFileName, "res/");
             strcat(tmpFileName, fileName);
 
+            // check if the file exist
             if (!access(tmpFileName, R_OK) == 0)
             {
+                // File does not exist
                 free(tmpFileName);
                 init_stream(&stream, FILE_DO_NOT_EXIST); // tell the client that the file do not exist
                 serStreamSize = serialize_stream(&stream, serStream);
                 send(communicationID, serStream, serStreamSize, 0); // send buffer to client
                 break;
             }
+            // File exist
+            init_stream(&stream, FILE_EXIST); // tell the client that the file do not exist
+            serStreamSize = serialize_stream(&stream, serStream);
+            send(communicationID, serStream, serStreamSize, 0); // send buffer to client
+
+            // Process the file, this will send it to the client
             printf("%d | Client requested existing file \"%s\" !\n", communicationID, tmpFileName);
-
             processFileForClient(tmpFileName, communicationID, &stream, serStream);
-
             printf("%d | File sent to client\n", communicationID);
+
             // NULL_CONTENT means that the file sending is finished
             init_stream(&stream, NULL_CONTENT);
             serStreamSize = serialize_stream(&stream, serStream);

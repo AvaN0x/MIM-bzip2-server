@@ -137,6 +137,21 @@ bool askForFile(int fdSocket, stream_t *stream, char *bufferString, char *serStr
         }
         printf("\nLe fichier demandé a bien été trouvé, son contenu va s'afficher ci-dessous :\n");
 
+        printf("bufferString : %s\n", bufferString);
+        FILE *file = fopen(bufferString, "w");
+        if (!file)
+        {
+            fprintf(stderr, "Le programme n'a pas les droits pour créer des fichiers ici.\n");
+            return false;
+        }
+
+        // Get next values from server, this is outside of the while loop because there is also one at the end of the loop for the next iteration
+        // this is to know when the file is over
+        bufSize = recv(fdSocket, serStream, STREAM_SIZE, 0);
+        if (bufSize < 1)
+            return false;
+        unserialize_stream(serStream, stream);
+
         while (stream->type != NULL_CONTENT)
         {
             int32_t idxBWT;
@@ -184,14 +199,16 @@ bool askForFile(int fdSocket, stream_t *stream, char *bufferString, char *serStr
 
             // All data are received, decode the data
             char *decodedString;
-            int decodedStringSize;
-
+            int decodedStringSize; // Not needed here
             decodeBZIP2(encodedBZIP2, encodedBZIP2Size, idxBWT, charFrequences, &decodedString, &decodedStringSize);
 
 #ifdef DEBUG_SEND_FILE
             printf(FONT_YELLOW "\"" FONT_DEFAULT);
 #endif
+            // Write content to console
             printf("%s", decodedString);
+            // Write content to file
+            fputs(decodedString, file);
 #ifdef DEBUG_SEND_FILE
             printf(FONT_YELLOW "\"\n" FONT_DEFAULT);
 #endif
@@ -203,6 +220,10 @@ bool askForFile(int fdSocket, stream_t *stream, char *bufferString, char *serStr
             unserialize_stream(serStream, stream);
         }
         printf("\n");
+
+        printf("\nLe contenu du fichier a également été écrit dans le fichier suivant \"" FONT_BLUE "%s" FONT_DEFAULT "\" situé à l'endroit où vous avez exécuté ce le client.\n", bufferString);
+
+        fclose(file);
     } while (true);
     return true;
 }
