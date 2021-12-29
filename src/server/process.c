@@ -109,7 +109,6 @@ void processFileForClient(char *filePath, int communicationID, stream_t *stream,
         return;
     }
 
-    printf("File content :\n");
     {
         char buffer[BUFFER_SIZE];
         int count = 0;
@@ -135,7 +134,6 @@ void processFileForClient(char *filePath, int communicationID, stream_t *stream,
             encodeBufferForClient(buffer, count, communicationID, stream, serStream);
             count = 0;
         }
-        printf("\n");
     }
 
     fclose(file);
@@ -157,7 +155,10 @@ void encodeBufferForClient(char *buffer, int size, int communicationID, stream_t
     // Max value of size is BUFFER_SIZE - 1
     char S[size + 1];
     strcpy(S, buffer);
+
+#ifdef DEBUG_SEND_FILE
     printf(FONT_YELLOW "%d: \"" FONT_DEFAULT "%s" FONT_YELLOW "\"\n\n" FONT_DEFAULT, size, S);
+#endif
 
     // encode bzip2
     int32_t charFrequences[128] = {};

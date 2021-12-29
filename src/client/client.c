@@ -135,13 +135,20 @@ bool askForFile(int fdSocket, stream_t *stream, char *bufferString, char *serStr
             printf("\nLe fichier demandé n'existe pas, veuillez réessayer.\n");
             continue;
         }
-        printf("\nLe fichier demandé a bien été trouvé, son contenu va s'afficher ci-dessous :\n");
+        printf(FONT_GREEN "\n> " FONT_DEFAULT "Le fichier demandé a bien été trouvé, son contenu va s'afficher ci-dessous :\n");
 
-        printf("bufferString : %s\n", bufferString);
-        FILE *file = fopen(bufferString, "w");
+        char *filePath = (char *)malloc(sizeof(char) * (strlen(bufferString) + 5));
+        strcpy(filePath, "serv_");
+        strcat(filePath, bufferString);
+
+#ifdef DEBUG_SEND_FILE
+        // printf("filePath : %s\n", filePath);
+#endif
+
+        FILE *file = fopen(filePath, "w");
         if (!file)
         {
-            fprintf(stderr, "Le programme n'a pas les droits pour créer des fichiers ici.\n");
+            fprintf(stderr, FONT_RED "Le programme n'a pas les droits pour créer des fichiers ici.\n" FONT_DEFAULT);
             return false;
         }
 
@@ -152,6 +159,7 @@ bool askForFile(int fdSocket, stream_t *stream, char *bufferString, char *serStr
             return false;
         unserialize_stream(serStream, stream);
 
+        printf(FONT_YELLOW "\"" FONT_DEFAULT);
         while (stream->type != NULL_CONTENT)
         {
             int32_t idxBWT;
@@ -219,11 +227,12 @@ bool askForFile(int fdSocket, stream_t *stream, char *bufferString, char *serStr
                 return false;
             unserialize_stream(serStream, stream);
         }
-        printf("\n");
+        printf(FONT_YELLOW "\"\n" FONT_DEFAULT);
 
-        printf("\nLe contenu du fichier a également été écrit dans le fichier suivant \"" FONT_BLUE "%s" FONT_DEFAULT "\" situé à l'endroit où vous avez exécuté ce le client.\n", bufferString);
+        printf(FONT_BLUE "\n> " FONT_DEFAULT "Le contenu du fichier a également été écrit dans le fichier suivant \"" FONT_BLUE "%s" FONT_DEFAULT "\" situé à l'endroit où vous avez exécuté le client.\n", filePath);
 
         fclose(file);
+        free(filePath);
     } while (true);
     return true;
 }

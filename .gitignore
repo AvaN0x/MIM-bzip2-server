@@ -11,3 +11,6 @@ bin/!.gitkeep
 # Obj files
 obj/*
 bin/!.gitkeep
+
+# Files received from server
+serv_*
