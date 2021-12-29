@@ -152,10 +152,34 @@ void processFileForClient(char *filePath, int communicationID, stream_t *stream,
  */
 void encodeBufferForClient(char *buffer, int size, int communicationID, stream_t *stream, char *serStream)
 {
-    // size_t serStreamSize;
+    size_t serStreamSize;
 
     // Max value of size is BUFFER_SIZE - 1
     char S[size + 1];
     strcpy(S, buffer);
     printf(FONT_YELLOW "%d: \"" FONT_DEFAULT "%s" FONT_YELLOW "\"\n\n" FONT_DEFAULT, size, S);
+
+    // encode bzip2
+    int charFrequences[128] = {};
+    unsigned char *huffmanEncoded;
+    int huffmanEncodedSize;
+    int idxBWT = encodeBZIP2(S, size, charFrequences, &huffmanEncoded, &huffmanEncodedSize);
+    // S will be freed by the function
+
+    printf("(%d) \"", huffmanEncodedSize);
+    for (int i = 0; i < huffmanEncodedSize; i++)
+        printf("%u ", huffmanEncoded[i]);
+    printf("\"\n");
+
+    printf("Send idx (%d)\n", idxBWT);
+    init_stream(stream, INT_CONTENT);
+    set_content(stream, &idxBWT, 0);
+    serStreamSize = serialize_stream(stream, serStream);
+    send(communicationID, serStream, serStreamSize, 0); // send buffer to client
+
+    printf("Send huffman\n");
+    init_stream(stream, SEND_GZIP2_STRING);
+    set_content(stream, huffmanEncoded, huffmanEncodedSize);
+    serStreamSize = serialize_stream(stream, serStream);
+    send(communicationID, serStream, serStreamSize, 0); // send buffer to client
 }

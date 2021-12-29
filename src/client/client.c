@@ -13,6 +13,8 @@
 #include "../shared/stream.h"
 #include "../shared/font_colors.h"
 
+#include "../shared/bzip2/bzip2.h"
+
 #define ADDRESS "127.0.0.1"
 
 /**
@@ -73,11 +75,14 @@ void connectedToServer(int fdSocket)
         case 0:
             loop = 0;                             // set the loop at false, will disconnect the client
             init_stream(&stream, END_CONNECTION); // tell the server that this client left
-            serStreamSize = serialize_stream(&stream, serStream, 0);
+            serStreamSize = serialize_stream(&stream, serStream);
             send(fdSocket, serStream, serStreamSize, 0); // send buffer to server
             break;
         case 1:
-            askForFile(fdSocket, &stream, bufferString, serStream);
+            if (!askForFile(fdSocket, &stream, bufferString, serStream))
+            {
+                printf(FONT_RED "\n/!\\ Erreur lors de la récupération du contenu du fichier.\n" FONT_DEFAULT);
+            }
             break;
         default:
             break;
@@ -94,7 +99,7 @@ void connectedToServer(int fdSocket)
  * @param bufferString the buffer that contain the string
  * @param serStream the buffer that will contain the serialized stream
  */
-void askForFile(int fdSocket, stream_t *stream, char *bufferString, char *serStream)
+bool askForFile(int fdSocket, stream_t *stream, char *bufferString, char *serStream)
 {
     size_t serStreamSize; // variable that will contain the size of setStream
     int bufSize;          // contain the return value of recv()
@@ -108,13 +113,13 @@ void askForFile(int fdSocket, stream_t *stream, char *bufferString, char *serStr
             break;
 
         init_stream(stream, SEND_FILE_NAME); // send file name to server
-        set_content(stream, bufferString);
-        serStreamSize = serialize_stream(stream, serStream, 0);
+        set_content(stream, bufferString, 0);
+        serStreamSize = serialize_stream(stream, serStream);
         send(fdSocket, serStream, serStreamSize, 0); // send buffer to server
 
         bufSize = recv(fdSocket, serStream, STREAM_SIZE, 0);
         if (bufSize < 1)
-            return;
+            return false;
         unserialize_stream(serStream, stream);
 
         if (stream->type == FILE_DO_NOT_EXIST)
@@ -123,8 +128,47 @@ void askForFile(int fdSocket, stream_t *stream, char *bufferString, char *serStr
             continue;
         }
         printf("\nLe fichier demandé a bien été trouvé, son contenu va s'afficher ci-dessous :\n");
+
+        while (stream->type != NULL_CONTENT)
+        {
+            // printf("%s", stream->content);
+            int idx;
+            int charFrequences[128];
+            unsigned char *encodedBZIP2;
+            uint64_t encodedBZIP2Size;
+
+            // Get idx
+            if (stream->type != INT_CONTENT)
+                return false;
+            idx = *(int *)stream->content;
+            printf("idx : %d\n", idx);
+
+            // Get charFrequences
+
+            // Get encodedBZIP2 and encodedBZIP2Size
+            bufSize = recv(fdSocket, serStream, STREAM_SIZE, 0);
+            if (bufSize < 1)
+                return false;
+            unserialize_stream(serStream, stream);
+            if (stream->type != SEND_GZIP2_STRING)
+                return false;
+            encodedBZIP2 = (unsigned char *)stream->content;
+            encodedBZIP2Size = stream->contentSize;
+
+            printf("(%ld) \"", encodedBZIP2Size);
+            for (int i = 0; i < encodedBZIP2Size; i++)
+                printf("%u ", encodedBZIP2[i]);
+            printf("\"\n");
+
+            // Receive another time for next while iteration
+            bufSize = recv(fdSocket, serStream, STREAM_SIZE, 0);
+            if (bufSize < 1)
+                return false;
+            unserialize_stream(serStream, stream);
+        }
         break;
     } while (true);
+    return true;
 }
 
 /**

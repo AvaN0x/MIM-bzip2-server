@@ -80,8 +80,6 @@ int encodeBZIP2(char *string, int size, int charFrequences[128], unsigned char *
     char *HuffmanDico[128] = {};
     buildCodeHuffman(charFrequences, HuffmanDico);
 
-    // unsigned char *encodedHuffman;
-    // int encodedHuffmanSize;
     *out = encodeHuffman(S_rle, rle_len, HuffmanDico, outSize);
     // S_rle will not be used anymore
     free(S_rle);
@@ -136,7 +134,6 @@ void decodeBZIP2(unsigned char *encodedHuffman, int encodedHuffmanSize, int idxB
 #endif
 
     char *decodedRLE;
-    // int decodedRLESize;
 
     decodeRLE(decodedHuffman, decodedHuffmanSize, &decodedRLE, outSize);
     // decodedHuffman will not be used anymore
@@ -170,7 +167,6 @@ void decodeBZIP2(unsigned char *encodedHuffman, int encodedHuffmanSize, int idxB
     printf(FONT_YELLOW "DECODE BWT\n" FONT_DEFAULT);
 #endif
 
-    // char decodedBWT[*outSize + 1];
     *out = malloc(*outSize + 1);
     decodeBWT(decodedM2F, *outSize, idxBWT, *out);
 

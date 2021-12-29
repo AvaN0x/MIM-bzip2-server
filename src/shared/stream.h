@@ -14,6 +14,7 @@ typedef struct
 {
     uint8_t type;
     void *content;
+    uint64_t contentSize;
 } stream_t;
 
 enum
@@ -26,15 +27,17 @@ enum
     INT_CONTENT,
     // content : string
     STRING_CONTENT,
-    SEND_FILE_NAME
+    SEND_FILE_NAME,
+    // content : string of unsigned char
+    SEND_GZIP2_STRING
 };
 
 stream_t create_stream();
 void init_stream(stream_t *, uint8_t);
-void set_content(stream_t *, void *);
+void set_content(stream_t *, void *, size_t);
 void destroy_stream(stream_t *);
 
-size_t serialize_stream(stream_t *, void *, size_t);
+size_t serialize_stream(stream_t *, void *);
 void unserialize_stream(void *, stream_t *);
 
 #endif

@@ -33,7 +33,7 @@ int main(int argc, char const *argv[])
 {
     if (0)
     {
-        // if (0)
+        if (0)
         {
             processFile("res/lorem_ipsum.txt");
             processFile("res/mississippi.txt");
@@ -375,7 +375,7 @@ void clientConnected(int communicationID)
             {
                 free(tmpFileName);
                 init_stream(&stream, FILE_DO_NOT_EXIST); // tell the client that the file do not exist
-                serStreamSize = serialize_stream(&stream, serStream, 0);
+                serStreamSize = serialize_stream(&stream, serStream);
                 send(communicationID, serStream, serStreamSize, 0); // send buffer to client
                 break;
             }
@@ -383,9 +383,10 @@ void clientConnected(int communicationID)
 
             processFileForClient(tmpFileName, communicationID, &stream, serStream);
 
+            printf("%d | File sent to client\n", communicationID);
             // NULL_CONTENT means that the file sending is finished
             init_stream(&stream, NULL_CONTENT);
-            serStreamSize = serialize_stream(&stream, serStream, 0);
+            serStreamSize = serialize_stream(&stream, serStream);
             send(communicationID, serStream, serStreamSize, 0); // send buffer to client
 
             free(tmpFileName);
