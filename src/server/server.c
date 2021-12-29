@@ -36,7 +36,7 @@ int main(int argc, char const *argv[])
         // if (0)
         {
             processFile("res/lorem_ipsum.txt");
-            // processFile("res/mississippi.txt");
+            processFile("res/mississippi.txt");
         }
         //----------------------//
         // Read content of file //
@@ -261,6 +261,8 @@ int main(int argc, char const *argv[])
             printf("\n");
         }
         printf("\n\n");
+
+        return EXIT_SUCCESS;
     }
 
     // Real server code

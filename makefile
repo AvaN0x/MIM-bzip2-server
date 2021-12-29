@@ -12,7 +12,7 @@ bin:
 	@[ -d $(BIN) ] || mkdir -p $(BIN)
 
 
-obj: objHuffman objBWT objM2F objRLE
+obj: objHuffman objBWT objM2F objRLE objBZIP2
 	@[ -d $(OBJ) ] || mkdir -p $(OBJ)
 
 objBWT:
@@ -23,13 +23,15 @@ objRLE:
 	@[ -d $(OBJ)/rle ] || mkdir -p $(OBJ)/rle
 objHuffman:
 	@[ -d $(OBJ)/huffman ] || mkdir -p $(OBJ)/huffman
+objBZIP2:
+	@[ -d $(OBJ)/bzip2 ] || mkdir -p $(OBJ)/bzip2
 
 
 client:
 	$(CC) $(FLAGS) $(SRC)/shared/stream.c $(SRC)/client/client.c -o $(BIN)/client
 
-server: bwt m2f huffman
-	$(CC) $(FLAGS) -o $(BIN)/server $(SRC)/shared/stream.c $(SRC)/server/process.c $(SRC)/server/server.c $(SRC)/shared/bwt/bwt.c $(SRC)/shared/m2f/m2f.c $(SRC)/shared/rle/rle.c $(SRC)/shared/huffman/node.c $(SRC)/shared/huffman/list.c $(SRC)/shared/huffman/huff.c $(SRC)/shared/huffman/count.c -lpthread -lm
+server: bwt m2f huffman bzip2
+	$(CC) $(FLAGS) -o $(BIN)/server $(SRC)/shared/stream.c $(SRC)/server/process.c $(SRC)/server/server.c $(SRC)/shared/bwt/bwt.c $(SRC)/shared/m2f/m2f.c $(SRC)/shared/rle/rle.c $(SRC)/shared/huffman/node.c $(SRC)/shared/huffman/list.c $(SRC)/shared/huffman/huff.c $(SRC)/shared/huffman/count.c $(SRC)/shared/bzip2/bzip2.c -lpthread -lm
 
 
 bwt: obj
@@ -41,6 +43,7 @@ m2f: obj
 rle: obj
 	$(CC) $(FLAGS) -o $(OBJ)/rle/rle.o -c $(SRC)/shared/rle/rle.c
 
+
 # Compile everything for Huffman
 huffman : obj $(OBJ)/huffman/node.o $(OBJ)/huffman/list.o
 	$(CC) $(FLAGS) -o $(OBJ)/huffman/huff.o -c $(SRC)/shared/huffman/huff.c
@@ -50,6 +53,9 @@ $(OBJ)/huffman/node.o : obj $(SRC)/shared/huffman/node.c
 
 $(OBJ)/huffman/list.o : obj $(SRC)/shared/huffman/list.c
 	$(CC) $(FLAGS) -o $(OBJ)/huffman/list.o -c $(SRC)/shared/huffman/list.c
+
+bzip2: obj
+	$(CC) $(FLAGS) -o $(OBJ)/bzip2/bzip2.o -c $(SRC)/shared/bzip2/bzip2.c
 
 
 rebuild: clean all
