@@ -83,29 +83,3 @@ void decodeM2F(char *shifts, int len, char *result)
     }
     result[len] = '\0';
 }
-
-// int main(int argc, char const *argv[])
-// {
-//     // char *S = "PSSMIPISSII";
-//     char *S = "mississippi";
-//     int len = strlen(S);
-
-//     char *shifts = (char *)calloc(len, sizeof(char));
-//     encodeM2F(S, len, shifts);
-
-//     printf("\033[0;33mENCODE\033[0m\n");
-//     printf("%s\n", S);
-//     for (int i = 0; i < len; i++)
-//         printf("%c (%2d) = %d\n", S[i], i, shifts[i]);
-//     for (int i = 0; i < len; i++)
-//         printf("%c", shifts[i]);
-//     printf("\n");
-
-//     printf("\033[0;33mDECODE\033[0m\n");
-//     char Sdecoded[len];
-//     decodeM2F(shifts, len, Sdecoded);
-//     printf("%s\n", Sdecoded);
-
-//     free(shifts);
-//     return EXIT_SUCCESS;
-// }

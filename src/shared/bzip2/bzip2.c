@@ -11,9 +11,7 @@
 #include "../m2f/m2f.h"
 #include "../rle/rle.h"
 
-#define DEBUG_BZIP2 1
-
-int encodeBZIP2(char *string, int size, int charFrequences[128], unsigned char **out, int *outSize)
+int32_t encodeBZIP2(char *string, int size, int32_t *charFrequences, unsigned char **out, int *outSize)
 {
     // Max value of size is BUFFER_SIZE - 1
 
@@ -22,7 +20,7 @@ int encodeBZIP2(char *string, int size, int charFrequences[128], unsigned char *
 #endif
 
     char str_bwt[size + 1];
-    int idx = encodeBWT(string, str_bwt);
+    int32_t idx = encodeBWT(string, str_bwt);
     // string will not be used anymore
 
 #ifdef DEBUG_BZIP2
@@ -111,10 +109,18 @@ int encodeBZIP2(char *string, int size, int charFrequences[128], unsigned char *
     return idx;
 }
 
-void decodeBZIP2(unsigned char *encodedHuffman, int encodedHuffmanSize, int idxBWT, int charFrequences[128], char **out, int *outSize)
+void decodeBZIP2(unsigned char *encodedHuffman, int encodedHuffmanSize, int32_t idxBWT, int32_t *charFrequences, char **out, int *outSize)
 {
     // Build Huffman dictionary
     char *HuffmanDico[128] = {};
+#ifdef DEBUG_BZIP2
+    for (int i = 0; i < 128; i++)
+    {
+        if (charFrequences[i] > 0)
+            printf("char(%2d) %c : %d\n ", i, i, charFrequences[i]);
+    }
+#endif
+
     buildCodeHuffman(charFrequences, HuffmanDico);
 
 #ifdef DEBUG_BZIP2

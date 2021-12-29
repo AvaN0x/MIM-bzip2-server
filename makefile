@@ -3,6 +3,9 @@ OBJ := obj
 SRC := src
 CC := gcc
 FLAGS := -Wall
+# FLAGS := -Wall -D DEBUG_SEND_FILE
+# FLAGS := -Wall -D DEBUG_BZIP2
+# FLAGS := -Wall -D DEBUG_BZIP2 -D TEST
 
 all: bin obj client server
 

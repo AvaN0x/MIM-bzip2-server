@@ -1,5 +1,4 @@
 #include <string.h>
-#include <stdio.h>
 #include "stream.h"
 
 /**
@@ -46,43 +45,30 @@ void set_content(stream_t *s, void *content, size_t size)
     {
     // if content is an int
     case INT_CONTENT:
-        s->content = malloc(sizeof(int8_t));
-        s->contentSize = 1;
-        memcpy(s->content, content, 1);
+        s->content = malloc(sizeof(int32_t));
+        s->contentSize = sizeof(int32_t);
+        memcpy(s->content, content, sizeof(int32_t));
         break;
 
     // if content is a string
     case STRING_CONTENT:
     case SEND_FILE_NAME:
-        s->contentSize = size > 0 ? size : strlen((char *)content); // get the length of the string
-        s->content = malloc(s->contentSize * sizeof(char));         // allocate the memory for the string
-        memcpy(s->content, content, s->contentSize);                // copy content
-        ((char *)s->content)[s->contentSize] = '\0';                // set the last char as '\0' to end the string
+        s->contentSize = size > 0 ? size : (strlen((char *)content) + 1); // get the length of the string
+        s->content = malloc(s->contentSize * sizeof(char));               // allocate the memory for the string
+        memcpy(s->content, content, s->contentSize);                      // copy content
+        // TODO strcpy
         break;
 
     case SEND_GZIP2_STRING:
         s->contentSize = size;                                       // get the length of the string
         s->content = malloc(s->contentSize * sizeof(unsigned char)); // allocate the memory for the string
         memcpy(s->content, content, s->contentSize);                 // copy content
-        // ((char *)s->content)[len] = '\0';                 // set the last char as '\0' to end the string
         break;
 
     case SEND_CHAR_FREQUENCES:
-        s->contentSize = 128;
-        for (int i = 0; i < 128; i++)
-        {
-            if (((int *)content)[i] > 0)
-                printf("content(%2d) %c : %d\n ", i, i, ((int *)content)[i]);
-        }
-
-        s->content = malloc(128 * sizeof(int));         // allocate the memory for the array
-        memcpy(s->content, content, 128 * sizeof(int)); // copy content
-        for (int i = 0; i < 128; i++)
-        {
-            if (((int *)s->content)[i] > 0)
-                printf("scontent(%2d) %c : %d\n ", i, i, ((int *)s->content)[i]);
-        }
-
+        s->contentSize = 128 * sizeof(int32_t);
+        s->content = malloc(128 * sizeof(int32_t));         // allocate the memory for the array
+        memcpy(s->content, content, 128 * sizeof(int32_t)); // copy content
         break;
 
     case NULL_CONTENT:
@@ -110,7 +96,6 @@ void destroy_stream(stream_t *s)
  * @param size size of the content, 0 to let the function compute it, needed for SEND_GZIP2_STRING !
  * @return the size of the buffer
  */
-// size_t serialize_stream(stream_t *s, void *buffer, size_t size)
 size_t serialize_stream(stream_t *s, void *buffer)
 {
     *((uint8_t *)buffer) = s->type;
@@ -127,8 +112,9 @@ size_t serialize_stream(stream_t *s, void *buffer)
 
     // if content is an int
     case INT_CONTENT:
-        memcpy(buffer, s->content, 1); // copy the int
-        return sizeof(uint8_t) + sizeof(uint8_t);
+        printf("s->content (int) : %d\n", *((int32_t *)s->content));
+        memcpy(buffer, s->content, sizeof(int32_t)); // copy the int
+        return sizeof(uint8_t) + sizeof(int32_t);
 
     // if content is a string
     case STRING_CONTENT:
@@ -140,15 +126,9 @@ size_t serialize_stream(stream_t *s, void *buffer)
         memcpy(buffer, s->content, s->contentSize); // copy the string
         return sizeof(uint8_t) + sizeof(uint64_t) + s->contentSize;
 
-        // case SEND_GZIP2_STRING:
-        //     *((uint64_t *)buffer) = size;     // add the length to the buffer as int64_t
-        //     buffer += sizeof(uint64_t);       // move in the buffer
-        //     memcpy(buffer, s->content, size); // copy the string
-        //     return sizeof(uint8_t) + sizeof(uint64_t) + size;
-
     case SEND_CHAR_FREQUENCES:
-        memcpy(buffer, s->content, 128 * sizeof(int)); // copy the array
-        return sizeof(uint8_t) + sizeof(int) * 128;
+        memcpy(buffer, s->content, 128 * sizeof(int32_t)); // copy the array
+        return sizeof(uint8_t) + sizeof(int32_t) * 128;
 
     default:
         return 0;
@@ -169,9 +149,9 @@ void unserialize_stream(void *buffer, stream_t *s)
     {
     // if content is an int
     case INT_CONTENT:
-        s->contentSize = 1;
-        s->content = malloc(sizeof(int8_t)); // allocate the size of an int
-        memcpy(s->content, buffer, 1);       // copy the int
+        s->contentSize = sizeof(int32_t);
+        s->content = malloc(sizeof(int32_t));        // allocate the size of an int
+        memcpy(s->content, buffer, sizeof(int32_t)); // copy the int
         break;
 
     // if content is a string
@@ -194,19 +174,8 @@ void unserialize_stream(void *buffer, stream_t *s)
 
     case SEND_CHAR_FREQUENCES:
         s->contentSize = 128;
-        s->content = malloc(128 * sizeof(int)); // allocate the size of the array
-        for (int i = 0; i < 128; i++)
-        {
-            if (((int *)buffer)[i] > 0)
-                printf("content(%2d) %c : %d\n ", i, i, ((int *)buffer)[i]);
-        }
-        memcpy(s->content, buffer, 128 * sizeof(int)); // copy content of the array
-        for (int i = 0; i < 128; i++)
-        {
-            if (((int *)s->content)[i] > 0)
-                printf("scontent(%2d) %c : %d\n ", i, i, ((int *)s->content)[i]);
-        }
-
+        s->content = malloc(128 * sizeof(int32_t));        // allocate the size of the array
+        memcpy(s->content, buffer, 128 * sizeof(int32_t)); // copy content of the array
         break;
 
     case NULL_CONTENT:

@@ -124,27 +124,3 @@ void decodeBWT(char *SL, int len, int idx, char *outS)
     // for (int i = 0; i < len; i++)
     //     printf("%2d | %c | %2d | %c\n", i, F[i], T[i], SL[i]);
 }
-
-// int main(int argc, char const *argv[])
-// {
-//     //! Don't use char that are not in the ASCII table !!
-//     char *S = "lorem ipsum dolor sit amet";
-//     // char *S = "MISSISSIPPI";
-//     int len = strlen(S);
-
-//     char L[len + 1];
-//     int idx = encodeBWT(S, L);
-
-//     printf("%s\n", S);
-//     printf("\033[0;33mENCODE BWT\033[0m\n");
-//     printf("idx = %d\n", idx);
-
-//     printf("%s\n", L);
-
-//     printf("\033[0;33mDECODE BWT\033[0m\n");
-//     char Sdecoded[len + 1];
-//     decodeBWT(L, len, idx, Sdecoded);
-//     printf("%s\n", Sdecoded);
-
-//     return EXIT_SUCCESS;
-// }

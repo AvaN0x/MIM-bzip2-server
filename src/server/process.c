@@ -160,16 +160,18 @@ void encodeBufferForClient(char *buffer, int size, int communicationID, stream_t
     printf(FONT_YELLOW "%d: \"" FONT_DEFAULT "%s" FONT_YELLOW "\"\n\n" FONT_DEFAULT, size, S);
 
     // encode bzip2
-    int charFrequences[128] = {};
+    int32_t charFrequences[128] = {};
     unsigned char *huffmanEncoded;
     int huffmanEncodedSize;
     int idxBWT = encodeBZIP2(S, size, charFrequences, &huffmanEncoded, &huffmanEncodedSize);
     // S will be freed by the function
 
+#ifdef DEBUG_SEND_FILE
     printf("(%d) \"", huffmanEncodedSize);
     for (int i = 0; i < huffmanEncodedSize; i++)
         printf("%u ", huffmanEncoded[i]);
     printf("\"\n");
+#endif
 
     printf("Send idx (%d)\n", idxBWT);
     init_stream(stream, INT_CONTENT);
@@ -177,12 +179,6 @@ void encodeBufferForClient(char *buffer, int size, int communicationID, stream_t
     serStreamSize = serialize_stream(stream, serStream);
     send(communicationID, serStream, serStreamSize, 0); // send buffer to client
     printf("serStreamSize: %zu\n", serStreamSize);
-
-    // for (int i = 0; i < 128; i++)
-    // {
-    //     if (charFrequences[i] > 0)
-    //         printf("char(%d) %c : %d\n ", i, i, charFrequences[i]);
-    // }
 
     printf("Send char frequences\n");
     init_stream(stream, SEND_CHAR_FREQUENCES);

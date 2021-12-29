@@ -17,6 +17,10 @@
 
 #define ADDRESS "127.0.0.1"
 
+#ifdef TEST
+#include "test.c"
+#endif
+
 /**
  * Main function that connect to the server and start the conversation
  * @return exit status (EXIT_FAILURE || EXIT_SUCCESS)
@@ -43,6 +47,10 @@ int main()
         exit(EXIT_FAILURE);
     }
     printf(FONT_GREEN "Connected to %s:%d\n" FONT_DEFAULT, ADDRESS, PORT);
+
+#ifdef TEST
+    test(fdSocket);
+#endif
 
     // call the function that handle the connection
     connectedToServer(fdSocket);
@@ -131,9 +139,8 @@ bool askForFile(int fdSocket, stream_t *stream, char *bufferString, char *serStr
 
         while (stream->type != NULL_CONTENT)
         {
-            // printf("%s", stream->content);
-            int idxBWT;
-            int *charFrequences;
+            int32_t idxBWT;
+            int32_t charFrequences[128];
             unsigned char *encodedBZIP2;
             uint64_t encodedBZIP2Size;
 
@@ -141,7 +148,6 @@ bool askForFile(int fdSocket, stream_t *stream, char *bufferString, char *serStr
             if (stream->type != INT_CONTENT)
                 return false;
             idxBWT = *(int *)stream->content;
-            printf("idx : %d\n", idxBWT);
 
             // Get charFrequences
             bufSize = recv(fdSocket, serStream, STREAM_SIZE, 0);
@@ -150,13 +156,7 @@ bool askForFile(int fdSocket, stream_t *stream, char *bufferString, char *serStr
             unserialize_stream(serStream, stream);
             if (stream->type != SEND_CHAR_FREQUENCES)
                 return false;
-            charFrequences = (int *)stream->content;
-
-            for (int i = 0; i < 128; i++)
-            {
-                if (charFrequences[i] > 0)
-                    printf("char(%2d) %c : %d\n ", i, i, charFrequences[i]);
-            }
+            memcpy(charFrequences, stream->content, 128 * sizeof(int32_t));
 
             // Get encodedBZIP2 and encodedBZIP2Size
             bufSize = recv(fdSocket, serStream, STREAM_SIZE, 0);
@@ -168,20 +168,33 @@ bool askForFile(int fdSocket, stream_t *stream, char *bufferString, char *serStr
             encodedBZIP2 = (unsigned char *)stream->content;
             encodedBZIP2Size = stream->contentSize;
 
+#ifdef DEBUG_SEND_FILE
+            printf("idx : %d\n", idxBWT);
+            for (int i = 0; i < 128; i++)
+            {
+                if (charFrequences[i] > 0)
+                    printf("char(%2d) %c : %d\n ", i, i, charFrequences[i]);
+            }
+
             printf("(%ld) \"", encodedBZIP2Size);
             for (int i = 0; i < encodedBZIP2Size; i++)
                 printf("%u ", encodedBZIP2[i]);
             printf("\"\n");
+#endif
 
-            printf("1\n");
             // All data are received, decode the data
             char *decodedString;
             int decodedStringSize;
-            printf("2\n");
-            decodeBZIP2(encodedBZIP2, encodedBZIP2Size, idxBWT, charFrequences, &decodedString, &decodedStringSize);
-            printf("3\n");
 
-            printf(FONT_YELLOW "\"" FONT_DEFAULT "%s" FONT_YELLOW "\"\n\n" FONT_DEFAULT, decodedString);
+            decodeBZIP2(encodedBZIP2, encodedBZIP2Size, idxBWT, charFrequences, &decodedString, &decodedStringSize);
+
+#ifdef DEBUG_SEND_FILE
+            printf(FONT_YELLOW "\"" FONT_DEFAULT);
+#endif
+            printf("%s", decodedString);
+#ifdef DEBUG_SEND_FILE
+            printf(FONT_YELLOW "\"\n" FONT_DEFAULT);
+#endif
 
             // Receive another time for next while iteration
             bufSize = recv(fdSocket, serStream, STREAM_SIZE, 0);
@@ -189,7 +202,7 @@ bool askForFile(int fdSocket, stream_t *stream, char *bufferString, char *serStr
                 return false;
             unserialize_stream(serStream, stream);
         }
-        break;
+        printf("\n");
     } while (true);
     return true;
 }
