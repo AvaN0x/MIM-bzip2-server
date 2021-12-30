@@ -22,11 +22,9 @@
 #include "../shared/m2f/m2f.h"
 #include "../shared/rle/rle.h"
 
-#include "../shared/huffman/count.h"
+#include "test.h"
 
-#ifdef TEST
-#include "test.c"
-#endif
+#include "../shared/huffman/count.h"
 
 /**
  * Function that create the socket and manage all clients connections
@@ -35,6 +33,14 @@
  */
 int main(int argc, char const *argv[])
 {
+#ifdef TEST
+    testProcessFile();
+    testRLE();
+    testM2F();
+    testHuffman();
+    testBWT();
+#endif
+
     // Real server code
     int serverSocket = socket(PF_INET, SOCK_STREAM, 0);
     if (serverSocket < 0)
@@ -64,10 +70,6 @@ int main(int argc, char const *argv[])
     printf(FONT_GREEN "Server is listening on port %d\n" FONT_DEFAULT, PORT);
     // Main loop
     int sockaddr_in_size = sizeof(struct sockaddr_in);
-
-#ifdef TEST
-    test(serverSocket, sockaddr_in_size);
-#endif
 
     while (1)
     {
