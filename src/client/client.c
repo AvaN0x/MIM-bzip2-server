@@ -148,7 +148,7 @@ bool askForFile(int fdSocket, stream_t *stream, char *bufferString, char *serStr
         FILE *file = fopen(filePath, "w");
         if (!file)
         {
-            fprintf(stderr, FONT_RED "Le programme n'a pas les droits pour créer des fichiers ici.\n" FONT_DEFAULT);
+            fprintf(stderr, FONT_RED "\nLe programme n'a pas les droits pour créer des fichiers ici.\n" FONT_DEFAULT);
             return false;
         }
 
@@ -156,7 +156,10 @@ bool askForFile(int fdSocket, stream_t *stream, char *bufferString, char *serStr
         // this is to know when the file is over
         bufSize = recv(fdSocket, serStream, STREAM_SIZE, 0);
         if (bufSize < 1)
+        {
+            fprintf(stderr, FONT_RED "\nLe buffer reçu n'a pas de taille valide." FONT_DEFAULT);
             return false;
+        }
         unserialize_stream(serStream, stream);
 
         printf(FONT_YELLOW "\"" FONT_DEFAULT);
@@ -169,25 +172,40 @@ bool askForFile(int fdSocket, stream_t *stream, char *bufferString, char *serStr
 
             // Get idx
             if (stream->type != INT_CONTENT)
+            {
+                fprintf(stderr, FONT_RED "\nLe stream reçu n'a pas le type attendu, attendu %d, reçu %d." FONT_DEFAULT, INT_CONTENT, stream->type);
                 return false;
+            }
             idxBWT = *(int *)stream->content;
 
             // Get charFrequences
             bufSize = recv(fdSocket, serStream, STREAM_SIZE, 0);
             if (bufSize < 1)
+            {
+                fprintf(stderr, FONT_RED "\nLe buffer reçu n'a pas de taille valide." FONT_DEFAULT);
                 return false;
+            }
             unserialize_stream(serStream, stream);
             if (stream->type != SEND_CHAR_FREQUENCES)
+            {
+                fprintf(stderr, FONT_RED "\nLe stream reçu n'a pas le type attendu, attendu %d, reçu %d." FONT_DEFAULT, SEND_CHAR_FREQUENCES, stream->type);
                 return false;
+            }
             memcpy(charFrequences, stream->content, 128 * sizeof(int32_t));
 
             // Get encodedBZIP2 and encodedBZIP2Size
             bufSize = recv(fdSocket, serStream, STREAM_SIZE, 0);
             if (bufSize < 1)
+            {
+                fprintf(stderr, FONT_RED "\nLe buffer reçu n'a pas de taille valide." FONT_DEFAULT);
                 return false;
+            }
             unserialize_stream(serStream, stream);
             if (stream->type != SEND_GZIP2_STRING)
+            {
+                fprintf(stderr, FONT_RED "\nLe stream reçu n'a pas le type attendu, attendu %d, reçu %d." FONT_DEFAULT, SEND_GZIP2_STRING, stream->type);
                 return false;
+            }
             encodedBZIP2 = (unsigned char *)stream->content;
             encodedBZIP2Size = stream->contentSize;
 
@@ -224,7 +242,10 @@ bool askForFile(int fdSocket, stream_t *stream, char *bufferString, char *serStr
             // Receive another time for next while iteration
             bufSize = recv(fdSocket, serStream, STREAM_SIZE, 0);
             if (bufSize < 1)
+            {
+                fprintf(stderr, FONT_RED "\nLe buffer reçu n'a pas de taille valide." FONT_DEFAULT);
                 return false;
+            }
             unserialize_stream(serStream, stream);
         }
         printf(FONT_YELLOW "\"\n" FONT_DEFAULT);
