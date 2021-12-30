@@ -3,10 +3,9 @@ OBJ := obj
 SRC := src
 CC := gcc
 FLAGS := -Wall
-# FLAGS := -Wall -D DEBUG_SEND_FILE
-# FLAGS := -Wall -D DEBUG_SEND_FILE -D DEBUG_BZIP2
-# FLAGS := -Wall -D DEBUG_BZIP2
-# FLAGS := -Wall -D DEBUG_BZIP2 -D TEST
+# FLAGS := $(FLAGS) -D DEBUG_SEND_FILE
+# FLAGS := $(FLAGS) -D DEBUG_BZIP2
+# FLAGS := $(FLAGS) -D TEST
 
 all: server client
 

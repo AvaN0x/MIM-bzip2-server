@@ -83,8 +83,9 @@ void encodeRLE(char *S, int len, char **res, int *resLen)
 void decodeRLE(char *S, int len, char **res, int *resLen)
 {
     int shift = 0;
-    // Size can only be bigger than len
-    int size = len;
+    // // Size can only be equal or bigger than len
+    // int size = len; // FIXME temp fix with BUFFER_SIZE - 1
+    int size = BUFFER_SIZE - 1;
 
     *res = malloc((size + 1) * sizeof(char));
     globalCounter++;
@@ -100,7 +101,7 @@ void decodeRLE(char *S, int len, char **res, int *resLen)
             if (size > BUFFER_SIZE)
                 size = len;
             // Realloc res to new size
-            *res = realloc(*res, (size + 1) * sizeof(char));
+            *res = realloc(*res, size * sizeof(char));
         }
 
         // RLE
@@ -153,12 +154,11 @@ void decodeRLE(char *S, int len, char **res, int *resLen)
             }
         }
         // Only happen if the actual char and future ones do no have the pattern : ~|%d|%c
-        (*res)[shift] = S[i];
-        shift++;
+        (*res)[shift++] = S[i];
     }
     (*res)[shift] = '\0';
     *resLen = shift;
     // Realloc res to the exact size of the result
-    if (shift != len)
+    if (shift != size)
         *res = realloc(*res, (shift + 1) * sizeof(char));
 }

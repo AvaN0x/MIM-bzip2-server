@@ -1,8 +1,9 @@
 
 void testProcessFile()
 {
-    processFile("res/lorem_ipsum.txt");
     processFile("res/mississippi.txt");
+    // processFile("res/lorem_ipsum.txt");
+    processFile("res/encodedHuffman.txt");
 }
 
 void testRLE()
@@ -168,7 +169,7 @@ void testBWT()
 
 void test(int serverSocket, int sockaddr_in_size)
 {
-    // testProcessFile();
+    testProcessFile();
     // testRLE();
     // testM2F();
     // testHuffman();
