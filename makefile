@@ -3,17 +3,22 @@ OBJ := obj
 SRC := src
 CC := gcc
 FLAGS := -Wall
-# FLAGS := $(FLAGS) -D DEBUG_SEND_FILE
-# FLAGS := $(FLAGS) -D DEBUG_BZIP2
-# FLAGS := $(FLAGS) -D TEST
+
+DEBUG ?= 0
+ifeq ($(DEBUG),1)
+	FLAGS := $(FLAGS) -D DEBUG_SEND_FILE -D DEBUG_BZIP2
+endif
+
+test : FLAGS := $(FLAGS) -D TEST
+test : all
 
 all: server client
 
 client: bin bwt m2f rle huffman bzip2 stream
 	$(CC) $(FLAGS) -o $(BIN)/client $(SRC)/client/client.c $(OBJ)/stream.o $(OBJ)/bwt/bwt.o $(OBJ)/m2f/m2f.o $(OBJ)/rle/rle.o $(OBJ)/huffman/node.o $(OBJ)/huffman/list.o $(OBJ)/huffman/huff.o $(OBJ)/huffman/count.o $(OBJ)/bzip2/bzip2.o -lm
 
-server: bin bwt m2f rle huffman bzip2 stream process $(OBJ)/server/server.o
-	$(CC) $(FLAGS) -o $(BIN)/server $(OBJ)/server/server.o $(OBJ)/server/process.o $(OBJ)/stream.o $(OBJ)/bwt/bwt.o $(OBJ)/m2f/m2f.o $(OBJ)/rle/rle.o $(OBJ)/huffman/node.o $(OBJ)/huffman/list.o $(OBJ)/huffman/huff.o $(OBJ)/huffman/count.o $(OBJ)/bzip2/bzip2.o -lpthread -lm
+server: bin bwt m2f rle huffman bzip2 stream process $(OBJ)/server/server.o  $(OBJ)/server/test.o
+	$(CC) $(FLAGS) -o $(BIN)/server $(OBJ)/server/test.o $(OBJ)/server/server.o $(OBJ)/server/process.o $(OBJ)/stream.o $(OBJ)/bwt/bwt.o $(OBJ)/m2f/m2f.o $(OBJ)/rle/rle.o $(OBJ)/huffman/node.o $(OBJ)/huffman/list.o $(OBJ)/huffman/huff.o $(OBJ)/huffman/count.o $(OBJ)/bzip2/bzip2.o -lpthread -lm
 
 
 bwt: objBWT
@@ -48,6 +53,9 @@ process: objPROCESS
 
 $(OBJ)/server/server.o : $(SRC)/server/server.c
 	$(CC) $(FLAGS) -o $(OBJ)/server/server.o -c $(SRC)/server/server.c
+
+$(OBJ)/server/test.o : $(SRC)/server/test.c
+	$(CC) $(FLAGS) -o $(OBJ)/server/test.o -c $(SRC)/server/test.c
 
 bin:
 	@[ -d $(BIN) ] || mkdir -p $(BIN)
