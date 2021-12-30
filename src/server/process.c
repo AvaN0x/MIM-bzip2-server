@@ -182,6 +182,10 @@ void encodeBufferForClient(char *buffer, int size, int communicationID, stream_t
     send(communicationID, serStream, serStreamSize, 0); // send buffer to client
 
 #ifdef DEBUG_SEND_FILE
+    unserialize_stream(serStream, stream);
+    if (stream->type != INT_CONTENT)
+        fprintf(stderr, "Error: stream type is not INT_CONTENT\n");
+
     printf("serStreamSize: %zu\n", serStreamSize);
 
     printf("Send char frequences\n");
@@ -193,6 +197,10 @@ void encodeBufferForClient(char *buffer, int size, int communicationID, stream_t
     send(communicationID, serStream, serStreamSize, 0); // send buffer to client
 
 #ifdef DEBUG_SEND_FILE
+    unserialize_stream(serStream, stream);
+    if (stream->type != SEND_CHAR_FREQUENCES)
+        fprintf(stderr, "Error: stream type is not SEND_CHAR_FREQUENCES\n");
+
     printf("serStreamSize: %zu\n", serStreamSize);
 
     printf("Send huffman\n");
@@ -204,6 +212,10 @@ void encodeBufferForClient(char *buffer, int size, int communicationID, stream_t
     send(communicationID, serStream, serStreamSize, 0); // send buffer to client
 
 #ifdef DEBUG_SEND_FILE
+    unserialize_stream(serStream, stream);
+    if (stream->type != SEND_GZIP2_STRING)
+        fprintf(stderr, "Error: stream type is not SEND_GZIP2_STRING\n");
+
     printf("serStreamSize: %zu\n", serStreamSize);
 #endif
 }

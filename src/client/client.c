@@ -90,6 +90,12 @@ void connectedToServer(int fdSocket)
             if (!askForFile(fdSocket, &stream, bufferString, serStream))
             {
                 printf(FONT_RED "\n/!\\ Erreur lors de la récupération du contenu du fichier.\n" FONT_DEFAULT);
+                // Clear recv buffer
+                do
+                {
+                    recv(fdSocket, serStream, STREAM_SIZE, 0);
+                    unserialize_stream(serStream, &stream);
+                } while (stream.type != NULL_CONTENT);
             }
             break;
         default:
@@ -173,7 +179,7 @@ bool askForFile(int fdSocket, stream_t *stream, char *bufferString, char *serStr
             // Get idx
             if (stream->type != INT_CONTENT)
             {
-                fprintf(stderr, FONT_RED "\nLe stream reçu n'a pas le type attendu, attendu %d, reçu %d." FONT_DEFAULT, INT_CONTENT, stream->type);
+                fprintf(stderr, FONT_RED "\nLe stream reçu n'a pas le type attendu, attendu INT_CONTENT (%d), reçu %d." FONT_DEFAULT, INT_CONTENT, stream->type);
                 return false;
             }
             idxBWT = *(int *)stream->content;
@@ -188,7 +194,7 @@ bool askForFile(int fdSocket, stream_t *stream, char *bufferString, char *serStr
             unserialize_stream(serStream, stream);
             if (stream->type != SEND_CHAR_FREQUENCES)
             {
-                fprintf(stderr, FONT_RED "\nLe stream reçu n'a pas le type attendu, attendu %d, reçu %d." FONT_DEFAULT, SEND_CHAR_FREQUENCES, stream->type);
+                fprintf(stderr, FONT_RED "\nLe stream reçu n'a pas le type attendu, attendu SEND_CHAR_FREQUENCES (%d), reçu %d." FONT_DEFAULT, SEND_CHAR_FREQUENCES, stream->type);
                 return false;
             }
             memcpy(charFrequences, stream->content, 128 * sizeof(int32_t));
@@ -203,7 +209,7 @@ bool askForFile(int fdSocket, stream_t *stream, char *bufferString, char *serStr
             unserialize_stream(serStream, stream);
             if (stream->type != SEND_GZIP2_STRING)
             {
-                fprintf(stderr, FONT_RED "\nLe stream reçu n'a pas le type attendu, attendu %d, reçu %d." FONT_DEFAULT, SEND_GZIP2_STRING, stream->type);
+                fprintf(stderr, FONT_RED "\nLe stream reçu n'a pas le type attendu, attendu SEND_GZIP2_STRING (%d), reçu %d." FONT_DEFAULT, SEND_GZIP2_STRING, stream->type);
                 return false;
             }
             encodedBZIP2 = (unsigned char *)stream->content;
