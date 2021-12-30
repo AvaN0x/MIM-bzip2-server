@@ -29,11 +29,11 @@ void processFile(char *filePath)
 
     if (!file)
     {
-        fprintf(stderr, "File not found\n");
+        fprintf(stderr, "File (%s) not found\n", filePath);
         return;
     }
 
-    printf("File content :\n");
+    printf("File content (%s):\n", filePath);
     {
         char buffer[BUFFER_SIZE];
         int count = 0;
