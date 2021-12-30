@@ -230,7 +230,7 @@ unsigned char *encodeHuffman(const char *str, int lgthStr, char **HuffmanDico, i
 	res[resSize] = 0;
 	int count = 0;
 
-	FILE *binFile = fopen("res/huffmanEncoded.bin", "wb");
+	FILE *binFile = fopen("bin/huffmanEncoded.bin", "wb");
 	assert(binFile != NULL);
 
 	for (int i = 0; i < lgthStr; i++)
