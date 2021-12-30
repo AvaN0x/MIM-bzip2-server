@@ -1,9 +1,19 @@
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+
+#include "process.h"
+#include "../shared/bwt/bwt.h"
+#include "../shared/m2f/m2f.h"
+#include "../shared/rle/rle.h"
+#include "../shared/huffman/huff.h"
+#include "../shared/huffman/count.h"
+#include "../shared/font_colors.h"
 
 void testProcessFile()
 {
     processFile("res/mississippi.txt");
-    // processFile("res/lorem_ipsum.txt");
-    processFile("res/encodedHuffman.txt");
+    processFile("res/Text_de_base.txt");
 }
 
 void testRLE()
@@ -78,12 +88,10 @@ void testHuffman()
     // printf(FONT_YELLOW "AFTER BUILD HUFFMAN CODE GLOBAL COUNT IS %d\n" FONT_DEFAULT, globalCounter);
 
     // Print non null codes created
-    // if (0)
-    {
-        for (int i = 0; i < 128; i++)
-            if (HuffmanDico[i] != NULL)
-                printf("%d|%c : %s\n", i, i, HuffmanDico[i]);
-    }
+    printf("Huffman dictionnary\n");
+    for (int i = 0; i < 128; i++)
+        if (HuffmanDico[i] != NULL)
+            printf("%d|%c : %s\n", i, i, HuffmanDico[i]);
 
     // ------ ENCODE THE STRING ------ //
     unsigned char *encodedHuffman;
@@ -165,13 +173,4 @@ void testBWT()
     decodeBWT(L, len, idx, Sdecoded);
     printf("%s\n", Sdecoded);
     printf("\n");
-}
-
-void test(int serverSocket, int sockaddr_in_size)
-{
-    testProcessFile();
-    // testRLE();
-    // testM2F();
-    // testHuffman();
-    // testBWT();
 }
