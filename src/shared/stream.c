@@ -75,6 +75,7 @@ void set_content(stream_t *s, void *content, size_t size)
     case END_CONNECTION:
     case FILE_EXIST:
     case FILE_DO_NOT_EXIST:
+    case DATA_RECEIVED:
     default:
         s->content = NULL;
     }
@@ -110,6 +111,7 @@ size_t serialize_stream(stream_t *s, void *buffer)
     case END_CONNECTION:
     case FILE_EXIST:
     case FILE_DO_NOT_EXIST:
+    case DATA_RECEIVED:
         return sizeof(uint8_t);
 
     // if content is an int
@@ -183,6 +185,7 @@ void unserialize_stream(void *buffer, stream_t *s)
     case FILE_EXIST:
     case FILE_DO_NOT_EXIST:
     case END_CONNECTION:
+    case DATA_RECEIVED:
     default:
         break;
     }

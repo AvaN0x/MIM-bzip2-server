@@ -151,6 +151,7 @@ void processFileForClient(char *filePath, int communicationID, stream_t *stream,
 void encodeBufferForClient(char *buffer, int size, int communicationID, stream_t *stream, char *serStream)
 {
     size_t serStreamSize;
+    int bufSize;
 
     // Max value of size is BUFFER_SIZE - 1
     char S[size + 1];
@@ -181,6 +182,14 @@ void encodeBufferForClient(char *buffer, int size, int communicationID, stream_t
     serStreamSize = serialize_stream(stream, serStream);
     send(communicationID, serStream, serStreamSize, 0); // send buffer to client
 
+    // Wait for the client to tell us that it received the data
+    bufSize = recv(communicationID, serStream, serStreamSize, 0);
+    if (bufSize < 1)
+        fprintf(stderr, "Error: bufSize < 0\n");
+    unserialize_stream(serStream, stream);
+    if (stream->type != DATA_RECEIVED)
+        fprintf(stderr, "Error: stream type is not DATA_RECEIVED\n");
+
 #ifdef DEBUG_SEND_FILE
     unserialize_stream(serStream, stream);
     if (stream->type != INT_CONTENT)
@@ -206,6 +215,14 @@ void encodeBufferForClient(char *buffer, int size, int communicationID, stream_t
     printf("Send huffman\n");
 #endif
 
+    // Wait for the client to tell us that it received the data
+    bufSize = recv(communicationID, serStream, serStreamSize, 0);
+    if (bufSize < 1)
+        fprintf(stderr, "Error: bufSize < 0\n");
+    unserialize_stream(serStream, stream);
+    if (stream->type != DATA_RECEIVED)
+        fprintf(stderr, "Error: stream type is not DATA_RECEIVED\n");
+
     init_stream(stream, SEND_GZIP2_STRING);
     set_content(stream, huffmanEncoded, huffmanEncodedSize);
     serStreamSize = serialize_stream(stream, serStream);
@@ -218,4 +235,12 @@ void encodeBufferForClient(char *buffer, int size, int communicationID, stream_t
 
     printf("serStreamSize: %zu\n", serStreamSize);
 #endif
+
+    // Wait for the client to tell us that it received the data
+    bufSize = recv(communicationID, serStream, serStreamSize, 0);
+    if (bufSize < 1)
+        fprintf(stderr, "Error: bufSize < 0\n");
+    unserialize_stream(serStream, stream);
+    if (stream->type != DATA_RECEIVED)
+        fprintf(stderr, "Error: stream type is not DATA_RECEIVED\n");
 }

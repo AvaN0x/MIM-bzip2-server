@@ -7,8 +7,7 @@
 
 #define PORT 6000
 
-// #define STREAM_SIZE BUFFER_SIZE + 128
-#define STREAM_SIZE 1024 + 128
+#define STREAM_SIZE BUFFER_SIZE + 128
 
 typedef struct
 {
@@ -24,6 +23,7 @@ enum
     END_CONNECTION,
     FILE_EXIST,
     FILE_DO_NOT_EXIST,
+    DATA_RECEIVED,
     // content : int
     INT_CONTENT,
     // content : string

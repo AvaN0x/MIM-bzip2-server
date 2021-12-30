@@ -89,7 +89,7 @@ void connectedToServer(int fdSocket)
         case 1:
             if (!askForFile(fdSocket, &stream, bufferString, serStream))
             {
-                printf(FONT_RED "\n/!\\ Erreur lors de la récupération du contenu du fichier.\n" FONT_DEFAULT);
+                printf(FONT_RED "\n/!\\ Erreur lors de la récupération du contenu du fichier.\nCela peut potentiellement casser le programme et nécessiter son relancement.\n" FONT_DEFAULT);
                 // Clear recv buffer
                 do
                 {
@@ -184,6 +184,11 @@ bool askForFile(int fdSocket, stream_t *stream, char *bufferString, char *serStr
             }
             idxBWT = *(int *)stream->content;
 
+            // Tell the server that we received these data
+            init_stream(stream, DATA_RECEIVED);
+            serStreamSize = serialize_stream(stream, serStream);
+            send(fdSocket, serStream, serStreamSize, 0); // send buffer to server
+
             // Get charFrequences
             bufSize = recv(fdSocket, serStream, STREAM_SIZE, 0);
             if (bufSize < 1)
@@ -198,6 +203,11 @@ bool askForFile(int fdSocket, stream_t *stream, char *bufferString, char *serStr
                 return false;
             }
             memcpy(charFrequences, stream->content, 128 * sizeof(int32_t));
+
+            // Tell the server that we received these data
+            init_stream(stream, DATA_RECEIVED);
+            serStreamSize = serialize_stream(stream, serStream);
+            send(fdSocket, serStream, serStreamSize, 0); // send buffer to server
 
             // Get encodedBZIP2 and encodedBZIP2Size
             bufSize = recv(fdSocket, serStream, STREAM_SIZE, 0);
@@ -237,13 +247,20 @@ bool askForFile(int fdSocket, stream_t *stream, char *bufferString, char *serStr
 #ifdef DEBUG_SEND_FILE
             printf(FONT_YELLOW "\"" FONT_DEFAULT);
 #endif
+
             // Write content to console
             printf("%s", decodedString);
             // Write content to file
             fputs(decodedString, file);
+
 #ifdef DEBUG_SEND_FILE
             printf(FONT_YELLOW "\"\n" FONT_DEFAULT);
 #endif
+
+            // Tell the server that we received these data
+            init_stream(stream, DATA_RECEIVED);
+            serStreamSize = serialize_stream(stream, serStream);
+            send(fdSocket, serStream, serStreamSize, 0); // send buffer to server
 
             // Receive another time for next while iteration
             bufSize = recv(fdSocket, serStream, STREAM_SIZE, 0);
