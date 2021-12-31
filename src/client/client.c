@@ -17,10 +17,6 @@
 
 #define ADDRESS "127.0.0.1"
 
-#ifdef TEST
-#include "test.c"
-#endif
-
 /**
  * Main function that connect to the server and start the conversation
  * @return exit status (EXIT_FAILURE || EXIT_SUCCESS)
