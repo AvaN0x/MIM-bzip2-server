@@ -1,9 +1,11 @@
 # MIM-bzip2-server
 
 ## Sujet n°2 : Bzip2 au complet - BWT, M2F, RLE et Huffman
-    Participants :
-        RICATTE Clément  
-        BRUNGARD LUC
+
+<div align="center">
+    <h2>RICATTE Clément</h2>
+    <h2>BRUNGARD LUC</h2>
+</div>
 
 **Warning**
 Files must be located inside of the res folder.
@@ -188,7 +190,7 @@ Considérons la chaîne à encoder `S`.
     - `HuffmanDico` le dictionnaire contenant les codes de chaque caractère
     - `encodedLgth` un pointeur sur la longueur de la chaîne encodée  
 
-    ```
+    ```c
     res[longueur(str)];
     count = 0
     encodedLgth = 0
@@ -199,13 +201,15 @@ Considérons la chaîne à encoder `S`.
             res[encodedLgth] <<= 1
             res[encodedLgth] |= bit
             count++
+            // On désire enregistrer l'information par octet donc dès que 8 bits sont enregistrés, on passe à la case du tableau suivante
             si (count == 8)
                 res[++encodedLgth] = 0
                 count = 0
             fsi
         fpour
     fpour
-    si (count == 8)
+    // S'il reste des valeurs à enregistrer on les met en bit de poids fort
+    si (count != 0)
         res[++encodedLgth] <<= 8 - count
     fsi
     ```
