@@ -3,6 +3,13 @@
 #include <string.h>
 #include "m2f.h"
 
+/**
+ * Encode a specified string with M2F
+ *
+ * @param S The string to encode
+ * @param len The length of the string
+ * @param shifts the exit string containing all shifts (new values), need to be allocated before with the same length as the input string
+ */
 void encodeM2F(char *S, int len, char *shifts)
 {
     char alphabet[128];
@@ -38,6 +45,13 @@ void encodeM2F(char *S, int len, char *shifts)
     }
 }
 
+/**
+ * Decode a specified string with M2F
+ *
+ * @param shifts The original string containing all shifts (original values)
+ * @param len The length of the string
+ * @param result The exit string containing the decoded string, need to be allocated before with the same length as the shifts
+ */
 void decodeM2F(char *shifts, int len, char *result)
 {
     char alphabet[128];
