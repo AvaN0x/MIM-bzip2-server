@@ -13,18 +13,18 @@ For the server to find the res files, it needs to be executed in the parent fold
 
 Réalisation d'un programme client / serveur avec des sockets (protocole TCP).
 
-## Execution du projet
+## Exécution du projet
 
-**⚠ Projet développé sous WSL, donc linux. Nous ne savons pas s'il réagit comme voulu sous windows.**
+**⚠ Projet développé sous WSL, donc linux. Nous ne savons pas s'il réagit comme voulu sous Windows.**
 
-Dans un premier temps on se place à la racine du projet et on execute `make`.
+Dans un premier temps on se place à la racine du projet et on exécute `make`.
 
-Les deux executables se créent dans `bin`, il suffit donc de taper : 
+Les deux exécutables se créent dans `bin`, il suffit donc de taper : 
 - `./bin/client` pour lancer le client
 - `./bin/server` pour lancer le serveur
 
 Il est également possible de lancer le projet en tant que test avec `make test`.
-Ceci ajoute des test au début de l'éxécution du **serveur**.
+Ceci ajoute des test au début de l'exécution du **serveur**.
 Vous pouvez également ajouter des affichages lors de l'encodage et du décodage avec `make DEBUG=1`.
 
 
@@ -38,7 +38,7 @@ Vous pouvez également ajouter des affichages lors de l'encodage et du décodage
 - **encodeur**  
 L'encodeur reprend ce qui a été vu en cours : la fonction `indexL(chaîne S)` devient `int encodeBWT(char *S, char *L)` car nous ne renvoyons pas uniquement l'indice de départ (idx) mais nous modifions également L grâce à son pointeur placé en paramètre. Aucune autre modification n'a été réalisée par rapport au cours.
 - **decodeur**  
-Le decodeur (`void decodeBWT(char *SL, int len, int idx, char *outS)`) reçoit en paramètres :
+Le décodeur (`void decodeBWT(char *SL, int len, int idx, char *outS)`) reçoit en paramètres :
     - `L` une chaîne correspondant à la dernière colonne de la matrice des permutations du message à décoder,
     - `len` un entier correspondant à la longueur de la chaîne à décoder,
     - `idx` un entier correspondant à l'indice de départ de la recherche,
@@ -55,7 +55,7 @@ pour i de 0 à len - 1
     ascii_T[SL[i]]++
 fpour
 ```
-On incrémente `ascii_T[SL[i]]` car `F` est trié par ordre croissant donc la prochaine occurence du caractère sera le prochain caractère.  
+On incrémente `ascii_T[SL[i]]` car `F` est trié par ordre croissant donc la prochaine occurrence du caractère sera le prochain caractère.  
 Il ne reste plus qu'à construire la chaîne de retour en commençant par l'`idx` reçu en arguments de la fonction.
 ```c
 pour i de len-1 à 0
@@ -233,7 +233,7 @@ Considérons la chaîne à encoder `S`.
 `char *decodeHuffman(unsigned char *str, int lgthStr, char **HuffmanDico, int *decodedLgth)` renvoie la chaîne décodée et reçoit en paramètres :
     - `str` la chaîne encodée,
     - `lgthStr` la longueur de la chaîne encodée,
-    - `HuffmanDico` le dictionnaire conteanant le code de chaque caractère,
+    - `HuffmanDico` le dictionnaire contenant le code de chaque caractère,
     - `decodedLgth` la longueur de la chaîne décodée.  
 
     On initialise un tableau d'entier `candidatList` de longueur 128. Toutes les valeurs sont initialisées à 1. Si candidatList[0] = 1 cela signifie que le caractère de code ASCII 0 est candidat.
