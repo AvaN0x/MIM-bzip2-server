@@ -48,10 +48,6 @@ int main()
     }
     printf(FONT_GREEN "Connected to %s:%d\n" FONT_DEFAULT, ADDRESS, PORT);
 
-#ifdef TEST
-    test(fdSocket);
-#endif
-
     // call the function that handle the connection
     connectedToServer(fdSocket);
 

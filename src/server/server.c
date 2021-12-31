@@ -17,14 +17,10 @@
 #include "process.h"
 
 #include "../shared/font_colors.h"
-#include "../shared/huffman/huff.h"
-#include "../shared/bwt/bwt.h"
-#include "../shared/m2f/m2f.h"
-#include "../shared/rle/rle.h"
 
 #include "test.h"
 
-#include "../shared/huffman/count.h"
+#include "../shared/huffman/count.h" // FIXME: remove this
 
 /**
  * Function that create the socket and manage all clients connections

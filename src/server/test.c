@@ -3,12 +3,13 @@
 #include <stdio.h>
 
 #include "process.h"
+#include "../shared/font_colors.h"
 #include "../shared/bwt/bwt.h"
 #include "../shared/m2f/m2f.h"
 #include "../shared/rle/rle.h"
 #include "../shared/huffman/huff.h"
-#include "../shared/huffman/count.h"
-#include "../shared/font_colors.h"
+
+#include "../shared/huffman/count.h" // FIXME: remove this
 
 void testProcessFile()
 {
