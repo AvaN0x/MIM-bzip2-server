@@ -13,6 +13,21 @@ For the server to find the res files, it needs to be executed in the parent fold
 
 Réalisation d'un programme client / serveur avec des sockets (protocole TCP).
 
+## Execution du projet
+
+**⚠ Projet développé sous WSL, donc linux. Nous ne savons pas s'il réagit comme voulu sous windows.**
+
+Dans un premier temps on se place à la racine du projet et on execute `make`.
+
+Les deux executables se créent dans `bin`, il suffit donc de taper : 
+- `./bin/client` pour lancer le client
+- `./bin/server` pour lancer le serveur
+
+Il est également possible de lancer le projet en tant que test avec `make test`.
+Ceci ajoute des test au début de l'éxécution du **serveur**.
+Vous pouvez également ajouter des affichages lors de l'encodage et du décodage avec `make DEBUG=1`.
+
+
 ## Détails
 
 ### Description des algorithmes
