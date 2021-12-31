@@ -126,6 +126,7 @@ typedef struct elem_list_t
 } list_t;
 ```
 
+Le principe qui sera utilisé est le suivant : un noeud sera créé et contiendra les informations sur le caractère, fréquence, code, ... Puis ce noeud sera encapsulé dans un élément d'un liste chaînée. La liste chaînée permet de traiter les valeurs disponibles pour la construction de l'arbre d'Huffman. Une fois l'arbre construits, l'arbre ne peut être parcouru qu'à travers les **noeuds** (depuis la racine) et non plus des **éléments de la liste** chaînée.  
 Considérons la chaîne à encoder `S`.  
 
 - **Etape 1** : Lister la fréquence de chaque caractère de `S` dans un tableau `int charFrequences[128]`. L'indice 0 correspond au caractère de code ASCII 0.
