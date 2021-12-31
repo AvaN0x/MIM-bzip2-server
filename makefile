@@ -9,9 +9,6 @@ ifeq ($(DEBUG),1)
 	FLAGS := $(FLAGS) -D DEBUG_SEND_FILE -D DEBUG_BZIP2
 endif
 
-test: FLAGS := $(FLAGS) -D TEST
-test: all
-
 all: server client
 
 client: bin bwt m2f rle huffman bzip2 stream
@@ -77,6 +74,9 @@ objPROCESS: obj
 	@[ -d $(OBJ)/server ] || mkdir -p $(OBJ)/server
 
 rebuild: clean all
+
+test: FLAGS := $(FLAGS) -D TEST
+test: all
 
 clean:
 	rm -rf obj
