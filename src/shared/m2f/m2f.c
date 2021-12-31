@@ -60,7 +60,7 @@ void decodeM2F(char *shifts, int len, char *result)
         alphabet[i] = (char)i;
 
     char c;
-    // Loop for each char in S
+    // Loop for each char in shifts
     for (int i = 0; i < len; i++)
     {
         // result[i] = 'a';

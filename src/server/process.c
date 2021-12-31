@@ -12,10 +12,7 @@
 #include "process.h"
 
 #include "../shared/font_colors.h"
-// #include "../shared/huffman/huff.h"
-// #include "../shared/bwt/bwt.h"
-// #include "../shared/m2f/m2f.h"
-// #include "../shared/rle/rle.h"
+
 #include "../shared/bzip2/bzip2.h"
 
 /**
@@ -90,7 +87,6 @@ void encodeDecodeBufferBZIP2(char *buffer, int size)
     free(decodedString);
 }
 
-// TODO I kept the other functions above while we are not done, but I think we will delete them
 /**
  * Open a file, split the content into chunks of maximum size BUFFER_SIZE, and send them to encodeBufferAndSendToClient
  *

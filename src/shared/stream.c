@@ -56,7 +56,6 @@ void set_content(stream_t *s, void *content, size_t size)
         s->contentSize = size > 0 ? size : (strlen((char *)content) + 1); // get the length of the string
         s->content = malloc(s->contentSize * sizeof(char));               // allocate the memory for the string
         memcpy(s->content, content, s->contentSize);                      // copy content
-        // TODO strcpy
         break;
 
     case SEND_GZIP2_STRING:

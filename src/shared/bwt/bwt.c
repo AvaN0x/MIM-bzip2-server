@@ -5,11 +5,25 @@
 #include <stdbool.h>
 #include "bwt.h"
 
+/**
+ * Increment and int with a max value, if at max, will go back to 0
+ *
+ * @param i The int to increment
+ * @param max The max value of the int
+ * @return int The new value of the int
+ */
 int inc(int i, int max)
 {
     return (i + 1) % max;
 }
 
+/**
+ * Decrement and int with a max value, if at 0, will go to (max - 1)
+ *
+ * @param i The int to decrement
+ * @param max The max value of the int
+ * @return int The new value of the int
+ */
 int dec(int i, int max)
 {
     return i == 0 ? (max - 1) : (i - 1);
@@ -30,6 +44,13 @@ int traiterSousChaines(char *S, int k, int j)
     return (S[ij] < S[ik]) ? j : k;
 }
 
+/**
+ * Encode a specified string with BWT
+ *
+ * @param S The string to encode
+ * @param L The exit string containing the encoded string
+ * @return int The index obtained by the BWT
+ */
 int encodeBWT(char *S, char *L)
 {
     int idx, j, k;
@@ -68,11 +89,26 @@ int encodeBWT(char *S, char *L)
     return idx;
 }
 
+/**
+ * Function to sort with qsort an array of char *
+ *
+ * @param a left value
+ * @param b right value
+ * @return int difference between the two char
+ */
 int qsortString(const void *a, const void *b)
 {
     return *(char *)a - *(char *)b;
 }
 
+/**
+ * Decode a specified string with BWT
+ *
+ * @param SL The string to decode
+ * @param len The length of the string
+ * @param idx The index defined with encode
+ * @param outS The exit string containing the decoded string, need to be allocated before with the same length as the input string
+ */
 void decodeBWT(char *SL, int len, int idx, char *outS)
 {
     //#region create F column (sorted SL)

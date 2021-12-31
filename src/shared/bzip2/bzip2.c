@@ -11,6 +11,16 @@
 #include "../m2f/m2f.h"
 #include "../rle/rle.h"
 
+/**
+ * Encode a specified string with bzip2 into a result buffer
+ *
+ * @param string The string to encode
+ * @param size The size of the string
+ * @param charFrequences The frequences of each char in the string, will be filled with the frequences of the string, size must be 128
+ * @param out The result buffer, will be allocated
+ * @param outSize The size of the result buffer
+ * @return int32_t
+ */
 int32_t encodeBZIP2(char *string, int size, int32_t *charFrequences, unsigned char **out, int *outSize)
 {
     // Max value of size is BUFFER_SIZE - 1
@@ -19,6 +29,7 @@ int32_t encodeBZIP2(char *string, int size, int32_t *charFrequences, unsigned ch
     printf(FONT_YELLOW "ENCODE BWT\n" FONT_DEFAULT);
 #endif
 
+    // Encoding BWT
     char str_bwt[size + 1];
     int32_t idx = encodeBWT(string, str_bwt);
     // string will not be used anymore
@@ -31,6 +42,7 @@ int32_t encodeBZIP2(char *string, int size, int32_t *charFrequences, unsigned ch
     printf(FONT_YELLOW "ENCODE M2F\n" FONT_DEFAULT);
 #endif
 
+    // Encode M2F
     char *shifts = (char *)calloc(size, sizeof(char));
     encodeM2F(str_bwt, size, shifts);
     // str_bwt will not be used anymore
@@ -49,6 +61,7 @@ int32_t encodeBZIP2(char *string, int size, int32_t *charFrequences, unsigned ch
     printf(FONT_YELLOW "ENCODE RLE\n" FONT_DEFAULT);
 #endif
 
+    // Encode RLE
     char *S_rle;
     int rle_len;
 
@@ -71,6 +84,7 @@ int32_t encodeBZIP2(char *string, int size, int32_t *charFrequences, unsigned ch
     printf(FONT_YELLOW "ENCODE HUFFMAN\n" FONT_DEFAULT);
 #endif
 
+    // Encode huffman
     // Frequences array
     for (int i = 0; i < rle_len; i++)
         charFrequences[(int)S_rle[i]]++;
@@ -103,8 +117,19 @@ int32_t encodeBZIP2(char *string, int size, int32_t *charFrequences, unsigned ch
     return idx;
 }
 
+/**
+ * Decode a bzip2 encoded string
+ *
+ * @param encodedHuffman The encoded string
+ * @param encodedHuffmanSize The size of the encoded string
+ * @param idxBWT The index of the bwt encoded string
+ * @param charFrequences The frequences of each char of the string before huffman encoding, size must be 128
+ * @param out The result buffer, will be allocated
+ * @param outSize The size of the result buffer
+ */
 void decodeBZIP2(unsigned char *encodedHuffman, int encodedHuffmanSize, int32_t idxBWT, int32_t *charFrequences, char **out, int *outSize)
 {
+    // Decode Huffman
     // Build Huffman dictionary
     char *HuffmanDico[128] = {};
 
@@ -133,6 +158,7 @@ void decodeBZIP2(unsigned char *encodedHuffman, int encodedHuffmanSize, int32_t 
     printf(FONT_YELLOW "DECODE RLE\n" FONT_DEFAULT);
 #endif
 
+    // Decode RLE
     char *decodedRLE;
 
     decodeRLE(decodedHuffman, decodedHuffmanSize, &decodedRLE, outSize);
@@ -154,6 +180,7 @@ void decodeBZIP2(unsigned char *encodedHuffman, int encodedHuffmanSize, int32_t 
     printf(FONT_YELLOW "DECODE M2F\n" FONT_DEFAULT);
 #endif
 
+    // Decode M2F
     char decodedM2F[*outSize];
 
     decodeM2F(decodedRLE, *outSize, decodedM2F);
@@ -167,6 +194,7 @@ void decodeBZIP2(unsigned char *encodedHuffman, int encodedHuffmanSize, int32_t 
     printf(FONT_YELLOW "DECODE BWT\n" FONT_DEFAULT);
 #endif
 
+    // Decode BWT
     *out = malloc(*outSize + 1);
     decodeBWT(decodedM2F, *outSize, idxBWT, *out);
 

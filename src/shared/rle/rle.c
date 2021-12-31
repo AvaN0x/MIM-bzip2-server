@@ -6,6 +6,16 @@
 #include "../huffman/count.h"
 
 // TODO @LucBrungard realloc(): invalid next size
+
+/**
+ * Encode a specified string with RLE into a result buffer
+ * Will do nothing if the result string would be bigger than the input string
+ *
+ * @param S The string to encode
+ * @param len The length of the string
+ * @param res The result buffer, will be allocated
+ * @param resLen The length of the result buffer
+ */
 void encodeRLE(char *S, int len, char **res, int *resLen)
 {
     int shift = 0;
@@ -80,6 +90,14 @@ void encodeRLE(char *S, int len, char **res, int *resLen)
         *res = realloc(*res, (shift + 1) * sizeof(char));
 }
 
+/**
+ * Decode a specified string with RLE
+ *
+ * @param S The string to decode
+ * @param len The length of the string
+ * @param res The result buffer, will be allocated
+ * @param resLen The length of the result buffer
+ */
 void decodeRLE(char *S, int len, char **res, int *resLen)
 {
     int shift = 0;
