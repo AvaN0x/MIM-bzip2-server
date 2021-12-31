@@ -224,4 +224,49 @@ Considérons la chaîne à encoder `S`.
         fpour
     fpour
     ```
-        
+
+
+---
+
+### Lecture de fichiers
+
+Lors de la lecture du fichier, on effectue deux choses :
+- on ne lit que les caractères de la table ASCII (0 à 127)
+- on découpe le fichier au fur et à mesure en plusieurs parties de taille `BUFFER_SIZE` (défini dans `src/shared/buffer.h`).
+Ceci permet de pouvoir faire les différents encodage et décodage sur une taille connue et nécessitant la string complète (BWT).
+
+
+### Client / serveur
+
+### Fonctionnement du projet
+
+Le fonctionnement du client / serveur est sur le même principe que les fichiers fournis avec le sujet.
+
+#### Envois de données client / serveur
+Les envois client / serveur se font à l'aide d'une structure `stream_t` qui contient un type, un contenu, et la taille de ce contenu.
+Pour un envoi de stream nous devons la sérialiser dans un buffer. Ce buffer aura la forme suivante dans la plupart des cas : 
+
+|   Type  |  Taille  | Contenu |
+| :-----: | :------: | :-----: |
+| `uint8` | `uint64` |    *    |
+
+Les exceptions possibles sont :
+- un entier, alors la taille est forcément 1 et n'est donc pas spécifiée
+- le contenu est *NULL*, dans ce cas il n'est pas nécessaire de le spécifier
+
+#### Serveur
+Le serveur se lance et va lancer une boucle infinie attendant des connexions. A chaque connexion sera assigné un thread permettant de réagir aux différentes demandes de l'utilisateur selon le type du stream.
+
+#### Client
+Le client se lance et se connecte directement au serveur dont l'IP est mis tant que macro `ADDRESS` dans le fichier `src/client/client.c`. Une fois connecté, l'utilisateur accède à un menu lui permettant de quitter ou de demander un fichier.
+
+S'il veut demander un fichier, il lui sera demandé le nom du fichier. Le serveur va alors, dans un premier temps, vérifier que le fichier existe bien et en avertir le client, puis lui envoyer le contenu du fichier encodé en BZIP2 et de quoi le décoder pour chaque partie découpée (de taille maximale `BUFFER_SIZE`).
+
+#### L'envoi des données pour décoder
+
+Pour que le client puisse décoder, il a besoin de 3 données : 
+- l'idx pour décoder BWT (type de stream : `INT_CONTENT`)
+- les fréquences des caractères après le RLE (type de stream : `SEND_CHAR_FREQUENCES`) qui permettent de recréer le dictionnaire de Huffman
+- la chaine de Huffman (type de stream : `SEND_GZIP2_STRING`)
+
+Pour éviter des problèmes apparaissant après plusieurs dizaines d'envois, le client envoi un stream de type `DATA_RECEIVED` au serveur à chaque fois qu'il reçoit un des 3 types ci-dessus.
