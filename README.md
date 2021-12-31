@@ -12,7 +12,12 @@ For the server to find the res files, it needs to be executed in the parent fold
 Réalisation d'un programme client / serveur avec des sockets (protocole TCP).
 
 ## Détails
+
+### Description des algorithmes
 #### BWT
+<details>
+<summary>Fonctionnement de l'algorithme (cliquez pour étendre)</summary>
+
 - **encodeur**  
 L'encodeur reprend ce qui a été vu en cours : la fonction `indexL(chaîne S)` devient `int encodeBWT(char *S, char *L)` car nous ne renvoyons pas uniquement l'indice de départ (idx) mais nous modifions également L grâce à son pointeur placé en paramètre. Aucune autre modification n'a été réalisée par rapport au cours.
 - **decodeur**  
@@ -41,9 +46,13 @@ pour i de len-1 à 0
     idx = T[idx]
 fpour
 ```
+</details>
 
 ---
 #### M2F
+<details>
+<summary>Fonctionnement de l'algorithme (cliquez pour étendre)</summary>
+
 - **encodeur**  
 L'encodeur `void encodeM2F(char *S, int len, char *shifts)` reçoit en paramètres : 
     - `S` la chaîne à encoder,
@@ -75,30 +84,41 @@ Le décodeur `void decodeM2F(char *shifts, int len, char *result)` reçoit en pa
     
 Il faut reconstruire un tableau de caractères nommé `alphabet` (table ASCII). Puis on exécute le même algorithme que l'encodeur. La *seule* différence sera qu'on enregistre dans la chaîne de retour le caractère trouvé à l'indice `shifts[i]` et non pas son indice.  
 
+</details>
+
 ---
 #### RLE
+<details open>
+<summary>Fonctionnement de l'algorithme (cliquez pour étendre)</summary>
+// TODO
+
+</details>
 
 ---
+
 #### HUFFMAN
+<details open>
+<summary>Fonctionnement de l'algorithme (cliquez pour étendre)</summary>
+
 - **Types abstraits**  
 ```c
-//type pour représenter un caratère de l'alphabet.
+// type pour représenter un caratère de l'alphabet.
 typedef unsigned int symbol_t 
 
-//type pour représenter la fréquence d'un caractère dans une chaîne.
+// type pour représenter la fréquence d'un caractère dans une chaîne.
 typedef unsigned int frequence_t
 
-//type pour représenter un noeud dans un arbre binaire avec ses données
+// type pour représenter un noeud dans un arbre binaire avec ses données
 typedef struct elem_node_t
 {
 	symbol_t S;
 	frequence_t F;
-	char *code; //Le code "binaire" associé à l'arbre de Huffman (suite de '0' et '1')
-	int lvl; //La hauteur du noeud
-	struct elem_node_t *down, *up; //Respectivement enfant de droite et enfant de gauche
+	char *code; // Le code "binaire" associé à l'arbre de Huffman (suite de '0' et '1')
+	int lvl; // La hauteur du noeud
+	struct elem_node_t *down, *up; // Respectivement enfant de droite et enfant de gauche
 } node_t;
 
-//Structure pour construction d'une liste chaînée
+// Structure pour construction d'une liste chaînée
 typedef struct elem_list_t
 {
 	node_t *n;
@@ -110,15 +130,18 @@ Considérons la chaîne à encoder `S`.
 
 - **Etape 1** : Lister la fréquence de chaque caractère de `S` dans un tableau `int charFrequences[128]`. L'indice 0 correspond au caractère de code ASCII 0.
 
-- **Etape 2** : Construire le code de chaque caractère 
-`void buildCodeHuffman(int *frequencies, char **HuffmanDico)` reçoit en paramètres :
+- **Etape 2** : Construire le code de chaque caractère
+
+    `void buildCodeHuffman(int *frequencies, char **HuffmanDico)` reçoit en paramètres :
     - `frequencies` le tableau des fréquences de chaque caractère,
     - `HuffmanDico` un tableau de longueur 128 qui contiendra le code de chaque caractère ASCII. 
 
     Primitives utilisées :  
-        - `construireNoeud(symbol_t symbol, frequence_t frequence, chaine code, entier hauteur, node_t enfantDroite, node_t enfantGauche)`
-        - `construireListeElement(node_t nNode)`
-        - `insererNoeudTri(node_t nNode, list_t tete)`. Le tri est effectué de la manière suivante :
+    - `construireNoeud(symbol_t symbol, frequence_t frequence, chaine code, entier hauteur, node_t enfantDroite, node_t enfantGauche)`
+    - `construireListeElement(node_t nNode)`
+    - `insererNoeudTri(node_t nNode, list_t tete)`
+    
+    Le tri est effectué de la manière suivante :
     ```
     si ((nElement->n->F > nElement->suc->n->F) || ((nElement->n->S > nElement->suc->n->S) && (nElement->n->F == nElement->suc->n->F)))
         echanger(nElement, nElement->suc)
@@ -126,7 +149,7 @@ Considérons la chaîne à encoder `S`.
     ```
 
     ```c
-    //Construction de la liste initiale
+    // Construction de la liste initiale
     list_t tete = NULL;
     Pour i de 0 à 127 faire :
         si frequencies[i] > 0 alors
@@ -138,12 +161,12 @@ Considérons la chaîne à encoder `S`.
     ```
 
     ```c
-    //Construction de l'arbre de huffman
+    // Construction de l'arbre de huffman
     tant qu il y a plus d une valeur dans la liste chaînée faire
         trouverMin(tete, min1, min2)
         min1.code += "0"
         min2.code += "1"
-        //Création du nouveau noeud issu des min
+        // Création du nouveau noeud issu des min
         node_t nNode = construireNoeud('\0', min1.F + min2.F, "", max(min1.lvl, min2.lvl), min1, min2)
         list_t newElement = construireListeElement(nNode)
         tete = retirerMinListe(min1, min2, tete)
@@ -171,7 +194,7 @@ Considérons la chaîne à encoder `S`.
     res[encodedLgth] = 0
     Pour chaque caractere c de str faire
         pour chaque caractere cc de HuffmanDico[c] faire
-            bit = charToBit(cc) //renvoi cc - '0'
+            bit = charToBit(cc) // renvoi cc - '0'
             res[encodedLgth] <<= 1
             res[encodedLgth] |= bit
             count++
@@ -193,12 +216,13 @@ Considérons la chaîne à encoder `S`.
     - `HuffmanDico` le dictionnaire conteanant le code de chaque caractère,
     - `decodedLgth` la longueur de la chaîne décodée.  
 
-    On initialise une tableau d'entier `candidatList` de longueur 128. Toutes les valeurs sont initialisées à 1. Si candidatList[0] = 1 cela signifie que le caractère de code ASCII 0 est candidat.
+    On initialise un tableau d'entier `candidatList` de longueur 128. Toutes les valeurs sont initialisées à 1. Si candidatList[0] = 1 cela signifie que le caractère de code ASCII 0 est candidat.
 
     On initialise un entier `cursor` qui indiquera notre index dans un caractère. Il est initialisé à -1.
     ```c
     res = ""
     decodedLgth = 0
+    cursor = -1
     nbCandidat = 128
     candidatIdx = 8128; // Somme de 0 à 127
     Pour chaque octet o de str en commençant à l'indice 0
@@ -224,7 +248,7 @@ Considérons la chaîne à encoder `S`.
         fpour
     fpour
     ```
-
+</details>
 
 ---
 
