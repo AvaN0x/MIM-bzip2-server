@@ -33,7 +33,7 @@ pour i de 0 à len - 1
 fpour
 ```
 On incrémente `ascii_T[SL[i]]` car `F` est trié par ordre croissant donc la prochaine occurence du caractère sera le prochain caractère.  
-
+Il ne reste plus qu'à construire la chaîne de retour.
 ```
 pour i de len-1 à 0
     outS[i] = L[idx]
