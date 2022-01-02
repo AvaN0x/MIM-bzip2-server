@@ -3,6 +3,7 @@ desktop.ini
 
 # VSCode folder
 .vscode
+.vs
 
 # Compiled files
 bin/*
