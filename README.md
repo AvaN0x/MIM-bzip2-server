@@ -107,7 +107,7 @@ Il faut reconstruire un tableau de caractères nommé `alphabet` (table ASCII). 
 
 #### RLE
 
-<details open>
+<details>
 <summary>Fonctionnement de l'algorithme (cliquez pour étendre)</summary>
 
 ##### Principe de la compression
