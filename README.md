@@ -116,11 +116,11 @@ Il faut reconstruire un tableau de caractères nommé `alphabet` (table ASCII). 
   La compression réalisée propose ce format :
 
 ```c
-pour chaque caractère car de la chaine à compresser faire
-    si car à 5 occurences d affilée ou plus alors
-        res += ~|nbOccurence|car
+pour chaque caractère c de la chaine à compresser faire
+    si c à 5 occurences d affilée ou plus alors
+        res += ~|nbOccurence|c
     sinon
-        res += car
+        res += c
     fsi
 fpour
 ```
@@ -150,7 +150,7 @@ fpour
 
 #### HUFFMAN
 
-<details open>
+<details>
 <summary>Fonctionnement de l'algorithme (cliquez pour étendre)</summary>
 
 - **Types abstraits**
