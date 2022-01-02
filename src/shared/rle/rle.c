@@ -119,7 +119,7 @@ void decodeRLE(char *S, int len, char **res, int *resLen)
             if (size > BUFFER_SIZE)
                 size = len;
             // Realloc res to new size
-            *res = realloc(*res, size * sizeof(char));
+            *res = realloc(*res, (size + 1) * sizeof(char));
         }
 
         // RLE
