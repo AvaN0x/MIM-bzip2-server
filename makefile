@@ -12,10 +12,10 @@ endif
 all: server client
 
 client: bin bwt m2f rle huffman bzip2 stream
-	$(CC) $(FLAGS) -o $(BIN)/client $(SRC)/client/client.c $(OBJ)/stream.o $(OBJ)/bwt/bwt.o $(OBJ)/m2f/m2f.o $(OBJ)/rle/rle.o $(OBJ)/huffman/node.o $(OBJ)/huffman/list.o $(OBJ)/huffman/huff.o $(OBJ)/huffman/count.o $(OBJ)/bzip2/bzip2.o -lm
+	$(CC) $(FLAGS) -o $(BIN)/client $(SRC)/client/client.c $(OBJ)/stream.o $(OBJ)/bwt/bwt.o $(OBJ)/m2f/m2f.o $(OBJ)/rle/rle.o $(OBJ)/huffman/node.o $(OBJ)/huffman/list.o $(OBJ)/huffman/huff.o $(OBJ)/bzip2/bzip2.o -lm
 
 server: bin bwt m2f rle huffman bzip2 stream process $(OBJ)/server/server.o  $(OBJ)/server/test.o
-	$(CC) $(FLAGS) -o $(BIN)/server $(OBJ)/server/test.o $(OBJ)/server/server.o $(OBJ)/server/process.o $(OBJ)/stream.o $(OBJ)/bwt/bwt.o $(OBJ)/m2f/m2f.o $(OBJ)/rle/rle.o $(OBJ)/huffman/node.o $(OBJ)/huffman/list.o $(OBJ)/huffman/huff.o $(OBJ)/huffman/count.o $(OBJ)/bzip2/bzip2.o -lpthread -lm
+	$(CC) $(FLAGS) -o $(BIN)/server $(OBJ)/server/test.o $(OBJ)/server/server.o $(OBJ)/server/process.o $(OBJ)/stream.o $(OBJ)/bwt/bwt.o $(OBJ)/m2f/m2f.o $(OBJ)/rle/rle.o $(OBJ)/huffman/node.o $(OBJ)/huffman/list.o $(OBJ)/huffman/huff.o $(OBJ)/bzip2/bzip2.o -lpthread -lm
 
 
 bwt: objBWT
@@ -27,7 +27,7 @@ m2f: objM2F
 rle: objRLE
 	$(CC) $(FLAGS) -o $(OBJ)/rle/rle.o -c $(SRC)/shared/rle/rle.c
 
-huffman : objHuffman $(OBJ)/huffman/node.o $(OBJ)/huffman/list.o $(OBJ)/huffman/count.o
+huffman : objHuffman $(OBJ)/huffman/node.o $(OBJ)/huffman/list.o
 	$(CC) $(FLAGS) -o $(OBJ)/huffman/huff.o -c $(SRC)/shared/huffman/huff.c
 
 $(OBJ)/huffman/node.o : $(SRC)/shared/huffman/node.c
@@ -35,9 +35,6 @@ $(OBJ)/huffman/node.o : $(SRC)/shared/huffman/node.c
 
 $(OBJ)/huffman/list.o : $(SRC)/shared/huffman/list.c
 	$(CC) $(FLAGS) -o $(OBJ)/huffman/list.o -c $(SRC)/shared/huffman/list.c
-
-$(OBJ)/huffman/count.o : $(SRC)/shared/huffman/count.c
-	$(CC) $(FLAGS) -o $(OBJ)/huffman/count.o -c $(SRC)/shared/huffman/count.c
 
 bzip2: objBZIP2
 	$(CC) $(FLAGS) -o $(OBJ)/bzip2/bzip2.o -c $(SRC)/shared/bzip2/bzip2.c

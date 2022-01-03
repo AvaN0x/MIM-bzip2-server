@@ -20,8 +20,6 @@
 
 #include "test.h"
 
-#include "../shared/huffman/count.h" // FIXME: remove this
-
 /**
  * Function that create the socket and manage all clients connections
  * It also contains at the start, some tests for each encoder/decoder

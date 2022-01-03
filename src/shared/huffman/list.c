@@ -7,12 +7,9 @@
 #include "node.h"
 #include <unistd.h>
 
-#include "count.h"
-
 list_t *listConstruct(node_t *N)
 {
     list_t *list = (list_t *)malloc(sizeof(list_t));
-    globalCounter++;
     list->n = N;
     list->suc = NULL;
     return list;
@@ -21,7 +18,6 @@ list_t *listConstruct(node_t *N)
 list_t *emptyListCons()
 {
     list_t *list = (list_t *)malloc(sizeof(list_t));
-    globalCounter++;
     list->n = NULL;
     list->suc = NULL;
     return list;
@@ -106,10 +102,8 @@ list_t *removeMins(list_t *current, minNodes_t *minNodes)
     {
         free(head->suc);
         head->suc = NULL;
-        globalCounter--;
         free(head);
         head = NULL;
-        globalCounter--;
 
         return head;
     }
@@ -144,7 +138,6 @@ list_t *removeMins(list_t *current, minNodes_t *minNodes)
             removed++;
             free(current);
             current = NULL;
-            globalCounter--;
         }
 
         if (removed == 2)
@@ -194,17 +187,14 @@ void freeNodes(node_t *node)
     {
         free(node->code);
         node->code = NULL;
-        globalCounter--;
     }
     free(node);
     node = NULL;
-    globalCounter--;
 }
 
 char *toStringList(list_t *L)
 {
     char *buffer = (char *)malloc(sizeof(char) * (1000));
-    globalCounter++;
     if (L == NULL)
         sprintf(buffer, "Liste : [null]");
     else
@@ -213,7 +203,6 @@ char *toStringList(list_t *L)
         if (L->suc == NULL)
         {
             sprintf(strSuc, "[null]");
-            globalCounter++;
         }
         else
             strSuc = toStringNode(L->suc->n);
@@ -225,19 +214,15 @@ char *toStringList(list_t *L)
 
         free(strSuc);
         strSuc = NULL;
-        globalCounter--;
 
         free(strNode);
         strNode = NULL;
-        globalCounter--;
 
         free(strNode2);
         strNode2 = NULL;
-        globalCounter--;
 
         free(strNode3);
         strNode3 = NULL;
-        globalCounter--;
     }
 
     return buffer;
@@ -250,7 +235,6 @@ void printListElement(list_t *L)
 
     free(str);
     str = NULL;
-    globalCounter--;
 }
 
 void printList(list_t *L)
@@ -263,7 +247,6 @@ void printList(list_t *L)
 
         free(str);
         str = NULL;
-        globalCounter--;
 
         tmp = tmp->suc;
     }
@@ -288,7 +271,6 @@ void getCode(node_t *node, char **huffmanDico)
     if (node->down == NULL && node->up == NULL)
     {
         huffmanDico[node->S] = (char *)malloc(sizeof(char) * (lengthCode + 1));
-        globalCounter++;
         reverseCode(node->code);
         strcpy(huffmanDico[node->S], node->code);
     }

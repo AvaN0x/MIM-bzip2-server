@@ -9,8 +9,6 @@
 #include "../shared/rle/rle.h"
 #include "../shared/huffman/huff.h"
 
-#include "../shared/huffman/count.h" // FIXME: remove this
-
 void testProcessFile()
 {
     processFile("res/mississippi.txt");
@@ -85,9 +83,6 @@ void testHuffman()
     // ------ BUILD THE ODE FOR EACH CARACTER WHERE FREQ > 0 ------ //
     buildCodeHuffman(dico, HuffmanDico);
 
-    // memory management debug
-    // printf(FONT_YELLOW "AFTER BUILD HUFFMAN CODE GLOBAL COUNT IS %d\n" FONT_DEFAULT, globalCounter);
-
     // Print non null codes created
     printf("Huffman dictionnary\n");
     for (int i = 0; i < 128; i++)
@@ -98,9 +93,6 @@ void testHuffman()
     unsigned char *encodedHuffman;
     int encodedHuffmanSize;
     encodedHuffman = encodeHuffman(S, len, HuffmanDico, &encodedHuffmanSize);
-
-    // memory management debug
-    // printf(FONT_YELLOW "AFTER ENCODE GLOBAL COUNT IS %d\n" FONT_DEFAULT, globalCounter);
 
     /*
      * If you want to see the hexa code, open powershell terminal and type:
@@ -125,11 +117,9 @@ void testHuffman()
 
     // ------ FREE MEMORY ------ //
     free(encodedHuffman);
-    globalCounter--;
     encodedHuffman = NULL;
 
     free(decodedHuffman);
-    globalCounter--;
     decodedHuffman = NULL;
 
     // Free codes in HuffmanDico
@@ -138,13 +128,9 @@ void testHuffman()
         if (HuffmanDico[i] != NULL)
         {
             free(HuffmanDico[i]);
-            globalCounter--;
             HuffmanDico[i] = NULL;
         }
     }
-
-    // memory management debug
-    // printf(FONT_YELLOW "AFTER DECODE GLOBAL COUNT IS %d\n" FONT_DEFAULT, globalCounter);
 
     // Stats
     printf(FONT_YELLOW "\nStats\n" FONT_DEFAULT);

@@ -3,7 +3,6 @@
 #include <string.h>
 #include "rle.h"
 #include "../buffer.h"
-#include "../huffman/count.h"
 
 /**
  * Encode a specified string with RLE into a result buffer
@@ -19,7 +18,6 @@ void encodeRLE(char *S, int len, char **res, int *resLen)
     int shift = 0;
 
     *res = malloc((len + 1) * sizeof(char));
-    globalCounter++;
 
     char numberString[10];
     int thisCharCount = 0;
@@ -102,7 +100,6 @@ void decodeRLE(char *S, int len, char **res, int *resLen)
     int size = BUFFER_SIZE - 1;
 
     *res = malloc((size + 1) * sizeof(char));
-    globalCounter++;
 
     // For every char of S
     for (int i = 0; i < len; i++)
