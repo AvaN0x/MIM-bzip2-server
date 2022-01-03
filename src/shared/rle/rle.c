@@ -5,8 +5,6 @@
 #include "../buffer.h"
 #include "../huffman/count.h"
 
-// TODO @LucBrungard realloc(): invalid next size
-
 /**
  * Encode a specified string with RLE into a result buffer
  * Will do nothing if the result string would be bigger than the input string
@@ -101,8 +99,6 @@ void encodeRLE(char *S, int len, char **res, int *resLen)
 void decodeRLE(char *S, int len, char **res, int *resLen)
 {
     int shift = 0;
-    // // Size can only be equal or bigger than len
-    // int size = len; // FIXME temp fix with BUFFER_SIZE - 1
     int size = BUFFER_SIZE - 1;
 
     *res = malloc((size + 1) * sizeof(char));
